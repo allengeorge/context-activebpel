@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tamino-config>
+   <xquery-statements>
+      
+      <xquery-statement>
+         <name>Upgrade.GetAllReceivedItems</name>
+         <xquery><![CDATA[
+            input()/AeReceivedItem
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>Upgrade.InsertJournalItem</name>
+         <xquery>AeProcessJournal</xquery>
+      </xquery-statement>
+
+   </xquery-statements>
+</tamino-config>
