@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   This is the common SQL configuration file for the Active BPEL
+   engine.  This file contains SQL statements used by the Active
+   BPEL persistence layer that are common across multiple databases.
+   Configurations for specific databases can be found in their own
+   files (for example, the configuration for MySQL can be found in
+   the file mysql-sql.xml).  Values in the database-specific config
+   files will override values in this common file.
+-->
+<sql-config>
+   <sql-statements>
+
+      <!-- SQL Storage Upgrader -->
+      <sql-statement>
+         <name>Upgrade.GetAlarmsWithBadDeadlineMillis</name>
+         <sql>
+            SELECT * FROM AeAlarm WHERE DeadlineMillis = 0
+         </sql>
+      </sql-statement>
+
+      <sql-statement>
+         <name>Upgrade.UpdateDeadlineMillis</name>
+         <sql>
+            UPDATE AeAlarm SET DeadlineMillis = ? 
+            WHERE ProcessId = ? AND LocationPathId = ?
+         </sql>
+      </sql-statement>
+
+      <!-- Queue Storage Upgrader -->
+      <sql-statement>
+         <name>Upgrade.GetQueuedReceives</name>
+         <sql>
+            SELECT * FROM AeQueuedReceive
+         </sql>
+      </sql-statement>
+
+      <sql-statement>
+         <name>Upgrade.UpdateHashValues</name>
+         <sql>
+            UPDATE AeQueuedReceive SET MatchHash = ?, CorrelateHash = ?
+            WHERE QueuedReceiveId = ?
+         </sql>
+      </sql-statement>
+      
+      <sql-statement>
+         <name>Upgrade.GetDupeQueuedReceives</name>
+         <sql>
+            SELECT * FROM AeQueuedReceive WHERE CorrelateHash = -1
+         </sql>
+      </sql-statement>
+
+   </sql-statements>
+</sql-config>

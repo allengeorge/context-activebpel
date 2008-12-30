@@ -1,0 +1,366 @@
+<project name="ActiveBpel Deployer" default="activebpel.remote.dev.all" basedir="../">
+
+  <!-- ==================================================================== -->
+  <!-- Global Properties                                                    -->
+  <!-- Need to be set here, so they can be utilized by import build files   -->
+  <!-- ==================================================================== -->
+  <import file="common.xml"/>
+  <property environment="env"/>
+
+  <!-- set catalina home to environment or set a default -->
+  <condition property="catalina.home" value="${env.CATALINA_HOME}">
+  <isset property="env.CATALINA_HOME"/>
+  </condition>
+
+  <!-- TOMCAT Common PROPERTIES -->
+  <property name="catalina.home"            value="${root}jakarta-tomcat-5.0.25" />
+  <property name="catalina.deploy.dir"      value="${catalina.home}/bpr" />
+  <property name="catalina.class.dir"       value="${catalina.home}/shared/classes" />
+  <property name="catalina.lib.dir"         value="${catalina.home}/shared/lib" />
+
+  <!-- Tamino Schema install PROPERTIES -->
+  <property name="dbdomain" value="" />
+  <property name="dbuser" value="" />
+  <property name="dbpass" value="" />
+  <property name="dburl" value="http://localhost/tamino" />
+  <property name="dbdatabase" value="ActiveBPELDB" />
+
+  <!-- ==================================================================== -->
+  <!-- Remote connection properties                                         -->
+  <!-- ==================================================================== -->
+  <property name="tomcat.server" value="ececfiserv9.uwaterloo.ca"/>
+  <property name="tomcat.server.username" value="aageorge"/>
+  <property name="tomcat.server.password" value="xmppJabber"/>
+
+  <!-- TOMCAT Remote Common PROPERTIES -->
+  <property name="catalina.remote.home"            value="/opt/aag_services/apache-tomcat-5.5.25" />
+  <property name="catalina.remote.deploy.dir"      value="${catalina.remote.home}/bpr" />
+  <property name="catalina.remote.class.dir"       value="${catalina.remote.home}/shared/classes" />
+  <property name="catalina.remote.lib.dir"         value="${catalina.remote.home}/shared/lib" />
+
+  <!-- TOMCAT manager properties -->
+  <property name="catalina.username"               value="admin"/>
+  <property name="catalina.password"               value="adminadmin"/>
+  <property name="catalina.url"                    value="http://localhost:9090/manager"/>
+
+  <!-- ActiveBPEL webapp properties -->
+  <property name="activebpel.admin.path"           value="/BpelAdmin"/>
+  <property name="activebpel.admin.help.path"      value="/BpelAdminHelp"/>
+  <property name="activebpel.path"                 value="/active-bpel"/>
+
+  <!-- AeEngineConfig XSLT output directory -->
+  <property name="aeEngineConfig.output.dir" value="C:/dev/aeoutput/"/>
+
+  <!-- ==================================================================== -->
+  <!-- Patternset Definitions                                                    -->
+  <!-- ==================================================================== -->
+  <patternset id="activebpel.3rdparty.jars">
+    <patternset refid="awf.3rdparty.jars"/>
+  </patternset>
+
+  <patternset id="tomcat.activebpel.jars">
+    <patternset refid="activebpel.jars"/>
+  </patternset>
+
+  <!-- =========================================== -->
+  <!-- Compile ActiveBpel Jar Files                -->
+  <!-- =========================================== -->
+  <target name="compile.activebpel">
+    <build.project project="org.activebpel.wsio"/>
+    <build.project project="org.activebpel.rt"/>
+    <build.project project="ece.uwaterloo.ca.aag"/>
+    <build.project project="org.activebpel.rt.bpel"/>
+    <build.project project="org.activebpel.rt.bpel.ext.expr"/>
+    <build.project project="org.activebpel.rt.bpel.ext.expr.bsf"/>
+    <build.project project="org.activebpel.rt.bpel.server"/>
+    <build.project project="org.activebpel.rt.xmldb"/>
+    <build.project project="org.activebpel.rt.tamino"/>
+    <build.project project="org.activebpel.rt.exist"/>
+    <build.project project="ddl.org.activebpel"/>
+    <build.project project="org.activebpel.rt.axis"/>
+    <build.project project="org.activebpel.rt.axis.bpel.admin"/>
+    <build.project project="org.activebpel.rt.axis.bpel"/>
+    <build.project project="org.activebpel.rt.axis.bpel.web"/>
+    <build.project project="org.activebpel.rt.war" target="war"/>
+    <build.project project="org.activebpel.rt.bpeladmin.war" target="war"/>
+    <build.project project="org.activebpel.rt.bpeladmin.help.war" target="war"/>
+  </target>
+
+  <!-- =========================================== -->
+  <!-- Deploy ActiveBpel to Tomcat                 -->
+  <!-- =========================================== -->
+  <target name="deploy.activebpel" depends="config.activebpel" description="Builds all server jars, wars and bprs and updates the tomcat installation">
+    <echo message="Copying files to tomcat directory structure..."/>
+    <copy todir="${catalina.lib.dir}" overwrite="yes">
+       <fileset dir="${ae.dist}" casesensitive="yes">
+          <patternset refid="tomcat.activebpel.jars"/>
+       </fileset>
+    </copy>
+    <copy toDir="${catalina.lib.dir}" overwrite="yes">
+       <fileset dir="${ae.lib}">
+          <patternset refid="activebpel.3rdparty.jars"/>
+       </fileset>
+    </copy>
+    <copy todir="${catalina.class.dir}" overwrite="yes">
+       <fileset dir="${ae.projects}/org.activebpel.rt.axis.bpel/support/shared/classes" casesensitive="yes">
+          <include name="*.wsdd"/>
+          <include name="*.cmd"/>
+          <include name="*.sh"/>
+          <include name="*.keystore"/>
+       </fileset>
+    </copy>
+    <delete dir="${catalina.home}/webapps/BpelAdmin" quiet="true" />
+    <copy todir="${catalina.home}/webapps" overwrite="yes">
+       <fileset dir="${ae.dist}" casesensitive="yes">
+          <include name="BpelAdmin.war"/>
+       </fileset>
+    </copy>
+    <copy toFile="${catalina.home}/webapps/BpelAdminHelp.war" overwrite="yes" file="${ae.dist}/BpelAdminHelp.war"/>
+
+    <copy file="${ae.dist}/AeEngineAdmin.wsr" tofile="${catalina.deploy.dir}/AeEngineAdmin.wsr" overwrite="yes" />
+
+    <!-- deploy the active-bpel.war -->
+    <delete file="${catalina.home}/conf/Catalina/localhost/active-bpel.xml" quiet="true" />
+    <delete dir="${catalina.home}/webapps/active-bpel" quiet="true" />
+    <copy todir="${catalina.home}/webapps" file="${ae.dist}/activebpel/active-bpel.war" overwrite="yes" />
+
+    <!-- Ensure tomcat build gets in-memory config -->
+    <delete file="${catalina.deploy.dir}/aeEngineConfig.xml" quiet="true" />
+    <create.engineconfig
+         source="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-ActiveBPEL.xml"
+         dest="${catalina.deploy.dir}/aeEngineConfig.xml"
+         stylesheet="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-InMemory.xsl" />
+
+  </target>
+
+  <!-- =========================================== -->
+  <!-- Deploy ActiveBpel to Remote Tomcat          -->
+  <!-- =========================================== -->
+  <target name="deploy.remote.activebpel" depends="config.activebpel" description="Builds all server jars, wars and bprs and updates the remote tomcat installation">
+    <!-- Remove all the old stuff -->
+    <!-- NOTE: The undeploy task deletes the ActiveBPEL wars and exploded webapp directories -->
+    <echo message="Undeploying ActiveBPEL Admin..."/>
+    <undeploy url="${catalina.url}" username="${catalina.username}" password="${catalina.password}" path="${activebpel.admin.path}" failonerror="false"/>
+
+    <echo message="Undeploying ActiveBPEL Admin Help..."/>
+    <undeploy url="${catalina.url}" username="${catalina.username}" password="${catalina.password}" path="${activebpel.admin.help.path}" failonerror="false"/>
+
+    <echo message="Undeploying ActiveBPEL..."/>
+    <undeploy url="${catalina.url}" username="${catalina.username}" password="${catalina.password}" path="${activebpel.path}" failonerror="false"/>
+
+    <!--<echo message="CRUCIAL: Deleting contents of bpr directory..."/>
+    <sshexec host="${tomcat.server}" command="rm -rf ${catalina.remote.deploy.dir}/*" username="${tomcat.server.username}" password="${tomcat.server.password}" trust="true"/>-->
+
+    <!-- Copy the new stuff over -->
+    <echo message="Copying ActiveBPEL distribution files to tomcat directory structure..."/>
+    <scp todir="${tomcat.server.username}@${tomcat.server}:${catalina.remote.lib.dir}" password="${tomcat.server.password}" trust="true">
+      <fileset dir="${ae.dist}" casesensitive="yes">
+          <patternset refid="tomcat.activebpel.jars"/>
+       </fileset>
+    </scp>
+
+    <echo message="Copying third-party jars to shared/lib..."/>
+    <scp todir="${tomcat.server.username}@${tomcat.server}:${catalina.remote.lib.dir}" password="${tomcat.server.password}" trust="true">
+      <fileset dir="${ae.lib}">
+          <patternset refid="activebpel.3rdparty.jars"/>
+       </fileset>
+    </scp>
+
+    <echo message="Copying ActiveBPEL wsdd files to shared/classes..."/>
+    <!-- XXX ae-config wsdd files -->
+    <scp todir="${tomcat.server.username}@${tomcat.server}:${catalina.remote.class.dir}" password="${tomcat.server.password}" trust="true">
+      <fileset dir="${ae.projects}/org.activebpel.rt.axis.bpel/support/shared/classes" casesensitive="yes">
+          <include name="*.wsdd"/>
+          <include name="*.cmd"/>
+          <include name="*.sh"/>
+          <include name="*.keystore"/>
+       </fileset>
+    </scp>
+
+    <!--<echo message="Removing BPELAdmin exploded webapp directory..."/>
+    <sshexec host="${tomcat.server}" command="rm -rf ${catalina.remote.home}/webapps/BpelAdmin" username="${tomcat.server.username}" password="${tomcat.server.password}" trust="true"/>-->
+
+    <echo message="Copying BPELAdmin.war to webapp directory..."/>
+    <scp todir="${tomcat.server.username}@${tomcat.server}:${catalina.remote.home}/webapps" password="${tomcat.server.password}" trust="true">
+      <fileset dir="${ae.dist}" casesensitive="yes">
+        <include name="BpelAdmin.war"/>
+      </fileset>
+    </scp>
+
+    <echo message="Copying BPELAdminHelp.war to webapp directory..."/>
+    <scp remoteTofile="${tomcat.server.username}@${tomcat.server}:${catalina.remote.home}/webapps/BpelAdminHelp.war" file="${ae.dist}/BpelAdminHelp.war" password="${tomcat.server.password}" trust="true"/>
+
+
+    <!-- Shouldn't be needed any more since we're using the undeploy task
+    <echo message="Removing the ActiveBPEL Tomcat context file..."/>
+    <sshexec host="${tomcat.server}" command="rm -f ${catalina.remote.home}/conf/Catalina/localhost/active-bpel.xml" username="${tomcat.server.username}" password="${tomcat.server.password}" trust="true"/>
+
+    <echo message="Removing the active-bpel webapp directory..."/>
+    <sshexec host="${tomcat.server}" command="rm -rf ${catalina.remote.home}/webapps/active-bpel" username="${tomcat.server.username}" password="${tomcat.server.password}" trust="true"/>
+    -->
+
+    <echo message="Copying active-bpel.war to the webapp directory..."/>
+    <scp todir="${tomcat.server.username}@${tomcat.server}:${catalina.remote.home}/webapps" file="${ae.dist}/activebpel/active-bpel.war" password="${tomcat.server.password}" trust="true"/>
+
+    <echo message="Removing the ActiveBPEL engine configuration..."/>
+    <sshexec host="${tomcat.server}" command="rm -rf ${catalina.remote.deploy.dir}/aeEngineConfig.xml" username="${tomcat.server.username}" password="${tomcat.server.password}" trust="true"/>
+
+    <echo message="Removing the ActiveBPEL wsr file..."/>
+    <sshexec host="${tomcat.server}" command="rm -rf ${catalina.remote.deploy.dir}/AeEngineAdmin.wsr" username="${tomcat.server.username}" password="${tomcat.server.password}" trust="true"/>
+
+    <!-- Ensure tomcat build gets in-memory config -->
+    <delete file="${aeEngineConfig.output.dir}/aeEngineConfig.xml" quiet="true" />
+    <create.engineconfig
+         source="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-ActiveBPEL.xml"
+         dest="${aeEngineConfig.output.dir}/aeEngineConfig.xml"
+         stylesheet="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-InMemory.xsl" />
+
+    <echo message="Copying new ActiveBPEL engine configuration to /bpr directory..."/>
+    <scp remoteTofile="${tomcat.server.username}@${tomcat.server}:${catalina.remote.deploy.dir}/aeEngineConfig.xml" file="${aeEngineConfig.output.dir}/aeEngineConfig.xml" password="${tomcat.server.password}" trust="true"/>
+
+    <echo message="Copying AeEngineAdmin.wsr to /bpr directory..."/>
+    <scp remoteTofile="${tomcat.server.username}@${tomcat.server}:${catalina.remote.deploy.dir}/AeEngineAdmin.wsr" file="${ae.dist}/AeEngineAdmin.wsr" password="${tomcat.server.password}" trust="true"/>
+  </target>
+  
+  <!-- =========================================== -->
+  <!-- Creates the Active-bpel Active-bpel.war     -->
+  <!-- =========================================== -->
+  <target name="war.activebpel">
+    <!-- stage the active-bpel.war activebpel version -->
+    <delete dir="${ae.dist}/activebpel/active-bpel-war" quiet="true" />
+    <mkdir dir="${ae.dist}/activebpel/active-bpel-war" />
+    <!-- Content of the war directory -->
+    <copy todir="${ae.dist}/activebpel/active-bpel-war">
+      <fileset dir="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/active-bpel.war" />
+    </copy>
+    <create.engineconfig
+      source="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-ActiveBPEL.xml"
+      dest="${ae.dist}/activebpel/active-bpel-war/WEB-INF/classes/aeEngineConfig.xml"
+      stylesheet="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-InMemory.xsl" />
+
+    <!-- create the active-bpel.war -->
+    <war destfile="${ae.dist}/activebpel/active-bpel.war" webxml="${ae.dist}/activebpel/active-bpel-war/WEB-INF/web.xml">
+      <fileset dir="${ae.dist}/activebpel/active-bpel-war">
+        <exclude name="**/web.xml" />
+      </fileset>
+    </war>
+    <delete dir="${ae.dist}/activebpel/active-bpel-war"/>
+  </target>
+
+  <!-- =========================================== -->
+  <!-- Creates the Engine Config files             -->
+  <!-- =========================================== -->
+  <target name="config.activebpel">
+    <mkdir dir="${ae.dist}/conf" />
+    <create.engineconfig
+         source="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-ActiveBPEL.xml"
+         dest="${ae.dist}/conf/aeEngineConfig-InMemory.xml"
+         stylesheet="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-InMemory.xsl" />
+    <create.engineconfig
+         source="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-ActiveBPEL.xml"
+         dest="${ae.dist}/conf/aeEngineConfig-Persistent.xml"
+         stylesheet="${ae.projects}/org.activebpel.rt.axis.bpel.web/support/config/aeEngineConfig-Persistent.xsl" />
+    <create.engineconfig
+         source="${ae.dist}/conf/aeEngineConfig-Persistent.xml"
+         dest="${ae.dist}/conf/aeEngineConfig-Tamino.xml"
+         stylesheet="${ae.projects}/org.activebpel.rt.tamino/support/config/aeEngineConfig-Tamino.xsl" />
+    <copy file="${ae.dist}/conf/aeEngineConfig-InMemory.xml" tofile="${ae.dist}/conf/aeEngineConfig.xml" />
+
+    <update.engineconfig
+            source="${ae.dist}/conf/aeEngineConfig-Persistent.xml"
+            dest="${ae.dist}/conf/aeEngineConfig-Persistent.xml"
+            propfile="${ae.projects}/ddl.org.activebpel/src/org/activebpel/ddl/version.properties" />
+    <update.engineconfig
+            source="${ae.dist}/conf/aeEngineConfig-Tamino.xml"
+            dest="${ae.dist}/conf/aeEngineConfig-Tamino.xml"
+            propfile="${ae.projects}/ddl.org.activebpel/src/org/activebpel/ddl/version.properties" />
+  </target>
+
+  <!-- =========================================== -->
+  <!-- Creates the ActiveBpel DDL                  -->
+  <!-- =========================================== -->
+  <target name="ddl.activebpel">
+    <update.ddl
+            source="${basedir}/ddl.org.activebpel/ddl/ActiveBPEL-DB2.sql"
+            dest="${ae.dist}/sql/activebpel/ddl/ActiveBPEL-DB2.sql"
+            propfile="${basedir}/ddl.org.activebpel/src/org/activebpel/ddl/version.properties" />
+    <update.ddl
+            source="${basedir}/ddl.org.activebpel/ddl/ActiveBPEL-MySQL.sql"
+            dest="${ae.dist}/sql/activebpel/ddl/ActiveBPEL-MySQL.sql"
+            propfile="${basedir}/ddl.org.activebpel/src/org/activebpel/ddl/version.properties" />
+    <update.ddl
+            source="${basedir}/ddl.org.activebpel/ddl/ActiveBPEL-Oracle.sql"
+            dest="${ae.dist}/sql/activebpel/ddl/ActiveBPEL-Oracle.sql"
+            propfile="${basedir}/ddl.org.activebpel/src/org/activebpel/ddl/version.properties" />
+    <update.ddl
+            source="${basedir}/ddl.org.activebpel/ddl/ActiveBPEL-SQLServer.sql"
+            dest="${ae.dist}/sql/activebpel/ddl/ActiveBPEL-SQLServer.sql"
+            propfile="${basedir}/ddl.org.activebpel/src/org/activebpel/ddl/version.properties" />
+    <update.ddl
+            source="${basedir}/ddl.org.activebpel/ddl/ActiveBPEL-Informix.sql"
+            dest="${ae.dist}/sql/activebpel/ddl/ActiveBPEL-Informix.sql"
+          propfile="${basedir}/ddl.org.activebpel/src/org/activebpel/ddl/version.properties" />
+
+    <mkdir dir="${ae.dist}/tamino/activebpel/ddl" />
+    <copy file="${ae.projects}/ddl.org.activebpel/ddl/ActiveBPEL-Tamino.tsd" todir="${ae.dist}/tamino/activebpel/ddl" />
+  </target>
+
+  <!-- =========================================== -->
+  <!-- Install ActiveBPEL Tamino schema            -->
+  <!-- =========================================== -->
+  <target name="activebpel.tamino.dbinstall">
+    <echo message="Installing the ActiveBPEL Tamino schema." />
+    <java classname="org.activebpel.rt.bpel.server.engine.storage.tamino.installer.AeTaminoInstaller" fork="true" failonerror="true">
+       <arg value="-schema=${ae.dist}/tamino/activebpel/ddl/ActiveBPEL-Tamino.tsd"/>
+       <arg value="-url=${dburl}"/>
+       <arg value="-db=${dbdatabase}"/>
+       <arg value="-drop=true"/>
+       <arg value="-verbose=true"/>
+       <arg value="-domain=${dbdomain}" />
+       <arg value="-user=${dbuser}" />
+       <arg value="-pass=${dbpass}" />
+       <classpath>
+          <pathelement location="${ae.dist}/ae_rt.jar" />
+          <pathelement location="${ae.dist}/ae_rtbpel.jar" />
+          <pathelement location="${ae.dist}/ae_rtbpelsvr.jar" />
+          <pathelement location="${ae.dist}/ae_xmldb.jar" />
+          <pathelement location="${ae.dist}/ae_tamino.jar" />
+          <pathelement location="${ae.dist}/ae_exist.jar" />
+          <pathelement location="${ae.dist}/ae_upgrade.jar" />
+          <pathelement location="${ae.lib}/jaxen-1.1-beta-8.jar" />
+          <pathelement location="${ae.lib}/qname.jar" />
+          <pathelement location="${ae.lib}/log4j.jar" />
+          <pathelement location="${ae.lib}/xercesImpl.jar" />
+          <pathelement location="${ae.lib}/xmlParserAPIs.jar" />
+          <pathelement location="${ae.lib}/TaminoAPI4J.jar" />
+          <pathelement location="${ae.lib}/TaminoJCA.jar" />
+          <pathelement location="${ae.lib}/commonj-twm.jar" />
+       </classpath>
+    </java>
+  </target>
+
+  <!-- =========================================== -->
+  <!-- JAVADOC                                     -->
+  <!-- =========================================== -->
+  <target name="javadoc">
+    <generate.javadoc window.title="ActiveBpel API" doc.title="ActiveBpel API"
+      destdir="../doc/javadoc/activebpel"
+      overview="../doc/javadoc/activebpel/overview/overview.html"/>
+  </target>
+
+  <!-- =========================================== -->
+  <!-- Default Target                              -->
+  <!-- =========================================== -->
+  <target name="activebpel.all" depends="compile.activebpel, war.activebpel, config.activebpel, ddl.activebpel"/>
+
+  <!-- =========================================== -->
+  <!-- Dev Default Target                          -->
+  <!-- =========================================== -->
+  <target name="activebpel.dev.all" depends="activebpel.all, deploy.activebpel"/>
+
+  <!-- =========================================== -->
+  <!-- Dev Remote Default Target                   -->
+  <!-- =========================================== -->
+  <target name="activebpel.remote.dev.all" depends="activebpel.all, deploy.remote.activebpel"/>
+
+</project>

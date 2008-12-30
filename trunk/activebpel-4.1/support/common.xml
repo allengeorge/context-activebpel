@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="none" name="Common Macros for Active-Endpoints builds">
+    <property name="ae.projects" value="${basedir}"></property>
+    <property name="root" value="/"></property>
+    <property name="devroot" value="${basedir}/.."></property>
+    <property name="eclipse.home" value="/eclipse"></property>
+    <property name="ae.lib" value="${devroot}/lib"></property>
+    <property name="ae.dist" value="${devroot}/dist"></property>
+    <property name="ae.engineadmin.wsdl" value="${ae.projects}/org.activebpel.rt.bpel.server/support/ActiveBpelAdmin.wsdl"></property>
+    <available file="support/database.properties" property="database.propertyfile.override" type="file" value="true"></available>
+    <patternset id="activebpel.jars">
+        <include name="aag_museaxis.jar"></include>
+        <include name="ae_rt.jar"></include>
+        <include name="ae_rtbpel.jar"></include>
+        <include name="ae_rtexpr.jar"></include>
+        <include name="ae_rtexprbsf.jar"></include>
+        <include name="ae_rtbpelsvr.jar"></include>
+        <include name="ae_xmldb.jar"></include>
+        <include name="ae_tamino.jar"></include>
+        <include name="ae_exist.jar"></include>
+        <include name="ae_upgrade.jar"></include>
+        <include name="ae_rtaxis.jar"></include>
+        <include name="ae_rtaxisbpel.jar"></include>
+        <include name="ae_rtaxisadmin.jar"></include>
+        <include name="ae_axisweb.jar"></include>
+        <include name="ae_wsio.jar"></include>
+    </patternset>
+    <patternset id="identityservice.jars">
+        <include name="ae_rtidentity.jar"></include>
+    </patternset>
+    <patternset id="identityservice.ee.jars">
+        <patternset refid="identityservice.jars"></patternset>
+        <include name="ae_rtidentity_ee.jar"></include>
+    </patternset>
+    <patternset id="emailservice.jars">
+        <include name="ae_rtemail.jar"></include>
+    </patternset>
+    <patternset id="abe.base.jars">
+        <include name="ae_abeaxis.jar"></include>
+        <include name="ae_rtlicense.jar"></include>
+        <include name="ae_awfweb.jar"></include>
+        <include name="ae_axisweb.jar"></include>
+        <include name="ae_license.jar"></include>
+        <include name="ae_versioning.jar"></include>
+        <include name="ae_cluster.jar"></include>
+        <include name="ae_mom.jar"></include>
+        <include name="ae_wsrm.jar"></include>
+        <include name="ae_museclient.jar"></include>
+        <include name="ae_musesvr.jar"></include>
+        <include name="ae_awfxmldb.jar"></include>
+        <include name="ae_awftamino.jar"></include>
+        <include name="ae_awfexist.jar"></include>
+        <include name="ae_awfupgrade.jar"></include>
+        <include name="ae_rttasks.jar"></include>
+        <include name="ae_taskupgrade.jar"></include>
+        <include name="ae_rtmonitor.jar"></include>
+        <patternset refid="activebpel.jars"></patternset>
+        <patternset refid="identityservice.ee.jars"></patternset>
+        <patternset refid="emailservice.jars"></patternset>
+    </patternset>
+    <patternset id="abe.base.plus.ejb.jars">
+        <include name="ae_counter.jar"></include>
+        <include name="ae_awfwsio.jar"></include>
+        <patternset refid="activebpel.jars"></patternset>
+        <patternset refid="abe.base.jars"></patternset>
+    </patternset>
+    <patternset id="muse-2.2.0.jars">
+        <include name="muse-util-2.2.0.jar"></include>
+        <include name="muse-util-qname-2.2.0.jar"></include>
+        <include name="muse-util-xml-2.2.0.jar"></include>
+        <include name="muse-wsa-soap-2.2.0.jar"></include>
+        <include name="muse-core-2.2.0.jar"></include>
+        <include name="axis.jar"></include>
+        <include name="muse-wsdm-muws-api-2.2.0.jar"></include>
+        <include name="muse-wsdm-wef-api-2.2.0.jar"></include>
+        <include name="muse-wsn-api-2.2.0.jar"></include>
+        <include name="muse-wsrf-api-2.2.0.jar"></include>
+        <include name="muse-wsx-api-2.2.0.jar"></include>
+        <include name="muse-wsdm-muws-adv-api-2.2.0.jar"></include>
+        <include name="muse-wsdm-muws-impl-2.2.0.jar"></include>
+        <include name="cmuse-wsdm-wef-impl-2.2.0.jar"></include>
+        <include name="muse-wsn-impl-2.2.0.jar"></include>
+        <include name="muse-wsrf-impl-2.2.0.jar"></include>
+        <include name="muse-wsrf-rmd-2.2.0.jar"></include>
+        <include name="muse-wsx-impl-2.2.0.jar"></include>
+        <include name="muse-wsdm-muws-adv-impl-2.2.0.jar"></include>
+    </patternset>
+    <patternset id="awf.3rdparty.jars">
+        <include name="axis.jar"></include>
+        <include name="castor-1.0-xml.jar"></include>
+        <include name="commonj-twm.jar"></include>
+        <include name="commons-codec-1.3.jar"></include>
+        <include name="commons-dbutils-1.0.jar"></include>
+        <include name="commons-discovery.jar"></include>
+        <include name="commons-fileupload-1.0.jar"></include>
+        <include name="commons-httpclient-3.0-rc3.jar"></include>
+        <include name="commons-logging.jar"></include>
+        <include name="jaxen-1.1-beta-8.jar"></include>
+        <include name="jaxrpc.jar"></include>
+        <include name="log4j.jar"></include>
+        <include name="resolver.jar"></include>
+        <include name="saaj.jar"></include>
+        <include name="saxon8.jar"></include>
+        <include name="saxon8-dom.jar"></include>
+        <include name="bsf.jar"></include>
+        <include name="jython.jar"></include>
+        <include name="js-1.6R1.jar"></include>
+        <include name="TaminoAPI4J.jar"></include>
+        <include name="TaminoJCA.jar"></include>
+        <include name="wsdl4j.jar"></include>
+        <include name="xalan.jar"></include>
+        <include name="xercesImpl.jar"></include>
+        <include name="xmlParserAPIs.jar"></include>
+        <include name="xml-apis.jar"></include>
+        <include name="wss4j.jar"></include>
+        <include name="opensaml-1.0.1.jar"></include>
+        <include name="xmlsec-1.4.1.jar"></include>
+        <include name="muse.jar"></include>
+        <include name="activation.jar"></include>
+        <include name="mail.jar"></include>
+        <patternset refid="muse-2.2.0.jars"></patternset>
+    </patternset>
+    <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask"/>
+    <path id="base.path">
+        <dirset dir=".">
+            <include name="org*/src"></include>
+            <include name="com*/src"></include>
+        </dirset>
+    </path>
+    <macrodef name="build.project">
+        <attribute default="" name="project"></attribute>
+        <attribute default="jar_noclean" name="target"></attribute>
+        <sequential>
+            <echo message="Compiling @{project}"></echo>
+            <mkdir dir="@{project}/classes"></mkdir>
+            <ant antfile="support/build.xml" target="@{target}">
+                <property name="project" value="@{project}"></property>
+            </ant>
+        </sequential>
+    </macrodef>
+    <macrodef name="create.engineconfig">
+        <attribute default="" name="source"></attribute>
+        <attribute default="" name="dest"></attribute>
+        <attribute default="" name="stylesheet"></attribute>
+        <sequential>
+            <xslt force="true" in="@{source}" out="@{dest}" style="@{stylesheet}"></xslt>
+        </sequential>
+    </macrodef>
+    <macrodef name="update.engineconfig">
+        <attribute default="" name="source"></attribute>
+        <attribute default="" name="dest"></attribute>
+        <attribute default="" name="propfile"></attribute>
+        <sequential>
+            <loadproperties srcFile="@{propfile}">
+                <filterchain>
+                    <linecontains>
+                        <contains value="db.version"></contains>
+                    </linecontains>
+                </filterchain>
+            </loadproperties>
+            <echo message="Updating Engine Config @{source} to version ${db.version}"></echo>
+            <echo message="Updated Engine Config copy is at @{dest}"></echo>
+            <copy file="@{source}" tofile="@{dest}"></copy>
+            <replace file="@{dest}" propertyFile="@{propfile}">
+                <replacefilter property="db.version" token="@DB_VERSION@"></replacefilter>
+            </replace>
+            <replace file="@{dest}" token="value=&quot;mysql&quot;" value="value=&quot;${database}&quot;"></replace>
+        </sequential>
+    </macrodef>
+    <macrodef name="update.ddl">
+        <attribute default="" name="source"></attribute>
+        <attribute default="" name="dest"></attribute>
+        <attribute default="" name="propfile"></attribute>
+        <sequential>
+            <loadproperties srcFile="@{propfile}">
+                <filterchain>
+                    <linecontains>
+                        <contains value="db.version"></contains>
+                    </linecontains>
+                </filterchain>
+            </loadproperties>
+            <echo message="Updating DDL @{source} to version ${db.version}"></echo>
+            <echo message="Updated DDL.  Copy is at @{dest}"></echo>
+            <copy file="@{source}" overwrite="true" tofile="@{dest}"></copy>
+            <replace file="@{dest}" token="ActiveBPEL" value="${database.name}"></replace>
+            <replace file="@{dest}" propertyFile="@{propfile}">
+                <replacefilter property="db.version" token="@DB_VERSION@"></replacefilter>
+            </replace>
+        </sequential>
+    </macrodef>
+    <macrodef name="update.workflow.ddl">
+        <attribute default="" name="task.source.ddl"></attribute>
+        <attribute default="" name="base.ddl"></attribute>
+        <sequential>
+            <copy file="@{base.ddl}" toFile="${ae.dist}/sql/awf/ddl/tmp/base.ddl.sql"></copy>
+            <copy file="@{task.source.ddl}" toFile="${ae.dist}/sql/awf/ddl/tmp/task.ddl.sql">
+                <filterchain>
+                    <linecontains negate="true">
+                        <contains value="USE "></contains>
+                    </linecontains>
+                </filterchain>
+            </copy>
+            <concat append="false" destfile="@{base.ddl}" eol="dos" fixlastline="true">
+                <fileset dir="${ae.dist}/sql/awf/ddl/tmp" includes="*.sql"></fileset>
+            </concat>
+            <echo message="Adding Workflow DDL.  Copy is at @{base.ddl}"></echo>
+            <delete dir="${ae.dist}/sql/awf/ddl/tmp"></delete>
+        </sequential>
+    </macrodef>
+    <macrodef name="merge.tamino.schemas">
+        <attribute default="" name="schemaA"></attribute>
+        <attribute default="" name="schemaB"></attribute>
+        <attribute default="" name="outputFile"></attribute>
+        <sequential>
+            <xslt force="true" in="@{schemaA}" out="@{outputFile}" style="${ae.projects}/ddl.org.activebpel/support/TaminoSchemaMerge.xsl">
+                <param expression="@{schemaB}" name="schemaBFile"></param>
+            </xslt>
+        </sequential>
+    </macrodef>
+    <macrodef name="generate.javadoc">
+        <attribute default="" name="window.title"></attribute>
+        <attribute default="" name="doc.title"></attribute>
+        <attribute default="" name="overview"></attribute>
+        <attribute default="" name="destdir"></attribute>
+        <sequential>
+            <available file="${eclipse.home}" property="plugin.dir" value="${eclipse.home}/plugins"></available>
+            <condition property="plugin.dir" value="../lib">
+                <not>
+                    <isset property="plugin.dir"></isset>
+                </not>
+            </condition>
+            <javadoc access="private" author="true" breakiterator="true" defaultexcludes="yes" destdir="@{destdir}" maxmemory="256m" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" overview="@{overview}" sourcepathref="base.path" splitindex="true" use="true" verbose="false" version="true" windowtitle="@{window.title}">
+                <package name="com.*"></package>
+                <package name="org.*"></package>
+                <classpath>
+                    <fileset dir="../dist" includes="**/*.jar"></fileset>
+                    <fileset dir="../lib" includes="**/*.jar"></fileset>
+                </classpath>
+                <tag description="To do:" name="todo"></tag>
+                <doctitle>                    <![CDATA[<h1></h1>]]>
+@{doc.title}</doctitle>
+                <bottom>                    <![CDATA[<i>Copyright &#169; 2006 Active Endpoints. All Rights Reserved.</i>]]>
+</bottom>
+            </javadoc>
+        </sequential>
+    </macrodef>
+    <target name="common.compile.ejb.projects">
+        <build.project project="com.activee.rt.bpel.admin.ejb" target="jar"></build.project>
+    </target>
+    <target name="common.compile.enterprise.projects">
+        <build.project project="org.activebpel.wsio"></build.project>
+        <build.project project="org.activebpel.rt"></build.project>
+        <build.project project="org.activebpel.rt.bpel"></build.project>
+        <build.project project="org.activebpel.rt.bpel.ext.expr"></build.project>
+        <build.project project="org.activebpel.rt.bpel.ext.expr.bsf"></build.project>
+        <build.project project="org.activebpel.rt.bpel.server"></build.project>
+        <build.project project="org.activebpel.rt.xmldb"></build.project>
+        <build.project project="org.activebpel.rt.tamino"></build.project>
+        <build.project project="org.activebpel.rt.exist"></build.project>
+        <build.project project="org.activebpel.rt.axis.bpel.admin"></build.project>
+        <build.project project="org.activebpel.rt.axis"></build.project>
+        <build.project project="org.activebpel.rt.axis.bpel"></build.project>
+        <build.project project="org.activebpel.rt.axis.bpel.web"></build.project>
+        <build.project project="org.activebpel.rt.identity"></build.project>
+        <build.project project="org.activebpel.rt.email"></build.project>
+        <build.project project="org.activebpel.rt.war" target="war"></build.project>
+        <build.project project="org.activebpel.rt.bpeladmin.war" target="war"></build.project>
+        <build.project project="com.activee.license"></build.project>
+        <build.project project="com.activee.rt.bpel.licensing"></build.project>
+        <build.project project="org.activebpel.rt.tasks"></build.project>
+        <build.project project="com.activee.rt.mom"></build.project>
+        <build.project project="com.activee.rt.identity"></build.project>
+        <build.project project="com.activee.rt.bpel.monitoring"></build.project>
+        <build.project project="com.activee.rt.bpel.versioning"></build.project>
+        <build.project project="com.activee.rt.bpel.versioning.bpeladmin.war" target="war"></build.project>
+        <build.project project="com.activee.wsio"></build.project>
+        <build.project project="com.activee.rt.bpel.counter"></build.project>
+        <build.project project="com.activee.rt.muse.client"></build.project>
+        <build.project project="com.activee.rt.cluster"></build.project>
+        <build.project project="com.activee.rt.wsrm"></build.project>
+        <build.project project="com.activee.rt.mom.cluster"></build.project>
+        <build.project project="com.activee.rt.cluster.bpeladmin.war" target="war"></build.project>
+        <build.project project="com.activee.rt.muse.server"></build.project>
+        <build.project project="com.activee.rt.awf.web"></build.project>
+        <build.project project="com.activee.rt.axis.bpel"></build.project>
+        <build.project project="com.activee.rt.xmldb"></build.project>
+        <build.project project="com.activee.rt.tamino"></build.project>
+        <build.project project="com.activee.rt.exist"></build.project>
+        <build.project project="com.activee.tenant.manager"></build.project>
+        <build.project project="com.activee.tenant.manager.war" target="war"></build.project>
+        <build.project project="com.activee.tenant.manager.help.war" target="war"></build.project>
+        <build.project project="ddl.org.activebpel"></build.project>
+        <build.project project="ddl.org.activebpel.tasks"></build.project>
+        <build.project project="ddl.com.activee.awf"></build.project>
+        <build.project project="com.activee.rt.bpeladmin.enterprise.help.war" target="war"></build.project>
+        <build.project project="com.activee.rt.workflow.help.war" target="war"></build.project>
+    </target>
+    <target if="database.propertyfile.override" name="load.database.property.file">
+        <loadproperties srcFile="support/database.properties"></loadproperties>
+    </target>
+    <target depends="load.database.property.file" name="common.init">
+        <property name="database" value="mysql"></property>
+        <property name="database.username" value="bpeluser"></property>
+        <property name="database.password" value="bpel"></property>
+        <property name="database.host" value="localhost"></property>
+        <property name="database.name" value="ActiveBPEL"></property>
+        <property id="sqlserver.port" name="sqlserver.port" value="1433"></property>
+        <property id="db2.port" name="db2.port" value="50000"></property>
+        <property id="mysql.port" name="mysql.port" value="3306"></property>
+        <property id="oracle.port" name="oracle.port" value="1521"></property>
+        <property id="informix.port" name="informix.port" value="1526"></property>
+        <property name="database.port" refid="${database}.port"></property>
+        <property name="informix.server" value="ae_bpel_srv"></property>
+        <property id="mysql.url" name="mysql.url" value="jdbc:mysql://${database.host}:${database.port}/${database.name}?useUnicode=true&amp;amp;characterEncoding=UTF-8&amp;amp;characterSetResults=utf8"></property>
+        <property id="mysql.class" name="mysql.class" value="com.mysql.jdbc.Driver"></property>
+        <path id="mysql.path.jar">
+            <fileset dir="${devroot}/lib">
+                <patternset id="mysql.patternset.jar">
+                    <include name="mysql-connector-java-5.0.4-bin.jar"></include>
+                </patternset>
+            </fileset>
+        </path>
+        <property id="sqlserver.url" name="sqlserver.url" value="jdbc:jtds:sqlserver://${database.host}:${database.port}/${database.name}"></property>
+        <property id="sqlserver.class" name="sqlserver.class" value="net.sourceforge.jtds.jdbc.Driver"></property>
+        <path id="sqlserver.path.jar">
+            <fileset dir="${devroot}/lib">
+                <patternset id="sqlserver.patternset.jar">
+                    <include name="jtds-1.2.jar"></include>
+                </patternset>
+            </fileset>
+        </path>
+        <property id="db2.url" name="db2.url" value="jdbc:db2://${database.host}:${database.port}/${database.name}"></property>
+        <property id="db2.class" name="db2.class" value="com.ibm.db2.jcc.DB2Driver"></property>
+        <path id="db2.path.jar">
+            <fileset dir="${devroot}/lib">
+                <patternset id="db2.patternset.jar">
+                    <include name="db2jcc.jar"></include>
+                    <include name="db2jcc_license_cu.jar"></include>
+                </patternset>
+            </fileset>
+        </path>
+        <property id="oracle.url" name="oracle.url" value="jdbc:oracle:thin:@//${database.host}:${database.port}/${database.name}"></property>
+        <property id="oracle.class" name="oracle.class" value="oracle.jdbc.OracleDriver"></property>
+        <path id="oracle.path.jar">
+            <fileset dir="${devroot}/lib">
+                <patternset id="oracle.patternset.jar">
+                    <include name="ojdbc14.jar"></include>
+                </patternset>
+            </fileset>
+        </path>
+        <property id="informix.url" name="informix.url" value="jdbc:informix-sqli://${database.host}:${database.port}/${database.name}:INFORMIXSERVER=${informix.server};CLIENT_LOCALE=en_us.utf8;DB_LOCALE=en_us.utf8;LOBCACHE=-1;IFX_LOCK_MODE_WAIT=60;OPTCOMPIND=0"></property>
+        <property id="informix.class" name="informix.class" value="com.informix.jdbc.IfxDriver"></property>
+        <path id="informix.path.jar">
+            <fileset dir="${devroot}/lib">
+                <patternset id="informix.patternset.jar">
+                    <include name="ifxjdbc.jar"></include>
+                </patternset>
+            </fileset>
+        </path>
+        <property name="database.url" refid="${database}.url"></property>
+        <property name="database.class" refid="${database}.class"></property>
+        <script language="javascript">            <![CDATA[
+             var db = project.getProperty("database");
+             var newproperty = "";
+             var delimiter = "";
+             var onerror = "abort";
+             var autocommit = "false";
+
+             if (db=="mysql")
+             {
+                newproperty="MySQL";
+                delimiter=";";
+             }
+             if (db=="sqlserver")
+             {
+                newproperty="SQLServer";
+                delimiter="GO";
+             }
+
+             if (db=="db2")
+             {
+                newproperty="DB2";
+                delimiter=";";
+                onerror="continue";
+             }
+
+             if (db=="oracle") 
+             {
+                newproperty="Oracle";
+                delimiter=";";
+             }
+             if (db=="informix") 
+             {
+                newproperty="Informix";
+                onerror="continue";
+                delimiter=";";
+                autocommit="true";
+             }
+
+             project.setProperty("database.case.fixed", newproperty);
+             project.setProperty("sql.delimiter", delimiter);
+             project.setProperty("onerror", onerror);
+             project.setProperty("autocommit", autocommit);
+             ]]>
+</script>
+    </target>
+    <target name="none"></target>
+    <target name="common.create.workflow.ddl">
+        <update.workflow.ddl base.ddl="${ae.dist}/sql/awf/ddl/ActiveBPEL_Enterprise-MySQL.sql" task.source.ddl="${basedir}/ddl.org.activebpel.tasks/ddl/ActiveBPEL_Tasks-MySQL.sql"></update.workflow.ddl>
+        <update.workflow.ddl base.ddl="${ae.dist}/sql/awf/ddl/ActiveBPEL_Enterprise-DB2.sql" task.source.ddl="${basedir}/ddl.org.activebpel.tasks/ddl/ActiveBPEL_Tasks-DB2.sql"></update.workflow.ddl>
+        <update.workflow.ddl base.ddl="${ae.dist}/sql/awf/ddl/ActiveBPEL_Enterprise-Oracle.sql" task.source.ddl="${basedir}/ddl.org.activebpel.tasks/ddl/ActiveBPEL_Tasks-Oracle.sql"></update.workflow.ddl>
+        <update.workflow.ddl base.ddl="${ae.dist}/sql/awf/ddl/ActiveBPEL_Enterprise-SQLServer.sql" task.source.ddl="${basedir}/ddl.org.activebpel.tasks/ddl/ActiveBPEL_Tasks-SQLServer.sql"></update.workflow.ddl>
+        <update.workflow.ddl base.ddl="${ae.dist}/sql/awf/ddl/ActiveBPEL_Enterprise-Informix.sql" task.source.ddl="${basedir}/ddl.org.activebpel.tasks/ddl/ActiveBPEL_Tasks-Informix.sql"></update.workflow.ddl>
+        <update.workflow.ddl base.ddl="${ae.dist}/sql/awf/ddl/ActiveBPEL_Enterprise-DB2-390.sql" task.source.ddl="${basedir}/ddl.org.activebpel.tasks/ddl/ActiveBPEL_Tasks-DB2.sql"></update.workflow.ddl>
+    </target>
+    <target name="common.create.tamino.tsd">
+        <merge.tamino.schemas outputFile="${ae.dist}/tamino/awf/ddl/ActiveBPEL_Enterprise-Tamino.tsd" schemaA="${ae.projects}/ddl.com.activee.awf/ddl/ActiveBPEL_Enterprise-Tamino.tsd" schemaB="${ae.projects}/ddl.org.activebpel.tasks/ddl/ActiveBPEL_Tasks-Tamino.tsd"></merge.tamino.schemas>
+    </target>
+</project>
+
