@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xquery-statements version="2.0.0.5" schema="ActiveBPEL-Tamino-Schema-2.0.0.5.tsd">
+
+   <!--
+      Update the Null fields in the AeProcess 'table'.
+     -->
+   <upgrade-statement type="xquery" name="UpdateNullableProcessDocument"><![CDATA[
+      update for $proc in input()/AeProcess
+      where not($proc/ProcessDocument)
+      do insert <ProcessDocument ae-null="true" /> following $proc/ProcessName
+   ]]></upgrade-statement>
+   <upgrade-statement type="xquery" name="UpdateNullableProcessState"><![CDATA[
+      update for $proc in input()/AeProcess
+      where not($proc/ProcessState)
+      do insert <ProcessState ae-null="true">0</ProcessState> following $proc/ProcessDocument
+   ]]></upgrade-statement>
+   <upgrade-statement type="xquery" name="UpdateNullableProcessStateReason"><![CDATA[
+      update for $proc in input()/AeProcess
+      where not($proc/ProcessStateReason)
+      do insert <ProcessStateReason ae-null="true">0</ProcessStateReason> following $proc/ProcessState
+   ]]></upgrade-statement>
+   <upgrade-statement type="xquery" name="UpdateNullableProcessStartDate"><![CDATA[
+      update for $proc in input()/AeProcess
+      where not($proc/StartDate)
+      do insert <StartDate ae-null="true">1970-01-01T12:00:00Z</StartDate> following $proc/ProcessStateReason
+   ]]></upgrade-statement>
+   <upgrade-statement type="xquery" name="UpdateNullableProcessEndDate"><![CDATA[
+      update for $proc in input()/AeProcess
+      where not($proc/EndDate)
+      do insert <EndDate ae-null="true">1970-01-01T12:00:00Z</EndDate> following $proc/StartDate
+   ]]></upgrade-statement>
+   <upgrade-statement type="xquery" name="UpdateNullableProcessModifiedDate"><![CDATA[
+      update for $proc in input()/AeProcess
+      where not($proc/ModifiedDate)
+      do insert <ModifiedDate ae-null="true">1970-01-01T12:00:00Z</ModifiedDate> following $proc/PendingInvokesMap
+   ]]></upgrade-statement>
+   <upgrade-statement type="xquery" name="UpdateNullableProcessModifiedCount"><![CDATA[
+      update for $proc in input()/AeProcess
+      where not($proc/ModifiedCount)
+      do insert <ModifiedCount ae-null="true">0</ModifiedCount> following $proc/ModifiedDate
+   ]]></upgrade-statement>
+
+   <!--
+      Update the Null fields in the AeVariable 'table'.
+     -->
+   <upgrade-statement type="xquery" name="UpdateNullableVariableDocument"><![CDATA[
+      update for $var in input()/AeVariable
+      where not($var/VariableDocument)
+      do insert <VariableDocument ae-null="true" /> following $var/VersionNumber
+   ]]></upgrade-statement>
+
+   <!--
+      Add a new column to the AeQueuedReceive 'table'.
+     -->
+   <upgrade-statement type="xquery" name="AddColumnMessageExchange"><![CDATA[
+      update for $rec in input()/AeQueuedReceive
+      where not($rec/MessageExchange)
+      do insert <MessageExchange>/process/</MessageExchange> following $rec/CorrelateHash
+   ]]></upgrade-statement>
+
+   <!--
+      Copy data from the old AeReceivedItem table to the new AeProcessJournal table.
+     -->
+   <upgrade-statement type="java" name="CopyReceivedItemsToJournal">org.activebpel.ddl.storage.tamino.upgrade.AeTaminoJournalUpgrader2_1</upgrade-statement>
+
+   <!--
+      Clear all items from the AeReceivedItem table.
+     -->
+   <upgrade-statement type="xquery" name="RemoveAeReceivedItems"><![CDATA[
+      update for $item in input()/AeReceivedItem
+      do delete $item/..
+   ]]></upgrade-statement>
+
+   <!--
+      Undefine the AeReceivedItem doc type (drops that table).
+     -->
+   <upgrade-statement type="java" name="UndefineReceivedItemType">org.activebpel.ddl.storage.tamino.upgrade.AeTaminoReceivedItemUpgrader2_1</upgrade-statement>
+
+   <!--
+      Update the Version information in the database.
+     -->
+   <upgrade-statement type="xquery" name="UpdateDBVersion"><![CDATA[
+      update for $version in input()/AeMetaInfo[ @name = 'Version' ]
+      do replace $version with <AeMetaInfo name="Version">2.0.0.5</AeMetaInfo>
+   ]]></upgrade-statement>
+
+</xquery-statements>
