@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xquery-statements version="2.1.0.3" schema="ActiveBPEL-Tamino-Schema-2.1.0.3.tsd">
+
+   <!-- 
+      Delete the EngineID child element from all AeCoordination instances.
+    -->
+   <upgrade-statement type="xquery" name="RemoveEngineIdFromCoordination"><![CDATA[
+      update for $coord in input()/AeCoordination
+      do delete $coord/EngineID
+   ]]></upgrade-statement>
+
+   <!--
+      Update the Version information in the database.
+     -->
+   <upgrade-statement type="xquery" name="UpdateDBVersion"><![CDATA[
+      update for $version in input()/AeMetaInfo[ @name = 'Version' ]
+      do replace $version with <AeMetaInfo name="Version">2.1.0.3</AeMetaInfo>
+   ]]></upgrade-statement>
+
+</xquery-statements>

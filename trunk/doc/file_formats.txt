@@ -1,0 +1,212 @@
+			ActiveBPEL Engine File Formats
+
+
+
+Introduction
+============
+
+This document describes the format of various Extensible Markup Language (XML)
+files used to configure the ActiveBPEL engine and deploy Business Process
+Execution Language (BPEL) processes. It does not describe the format of BPEL
+files, however. For that, see Business Process Execution Language for Web
+Services Version 1.1 (BPEL4WS)
+(http://www-106.ibm.com/developerworks/library/ws-bpel).
+
+
+Notational Conventions
+----------------------
+
+This document uses an informal syntax to describe the XML grammar of the XML
+files that follow. It is very similar to the convention used in the BPEL spec,
+with a few minor changes. Namespace URIs of the general form "some-URI"
+represent some application-dependent or context-dependent URI as defined in
+RFC 2396.
+
+    * The syntax appears as an XML instance, but the values indicate the data
+      types instead of values.
+
+    * Characters are appended to elements and attributes as follows: "?" (0 or
+      1), "*" (0 or more), "+" (1 or more). The characters "[" and "]" are
+      used to indicate that contained items are to be treated as a group with
+      respect to the "?", "*", or "+" characters.</li>
+
+    * Elements and attributes separated by "|" and grouped by "(" and ")" are
+      meant to be syntactic alternatives.
+
+    * Schemas and examples skip the initial "<?xml...?>" preprocessor
+      directive.
+
+
+File Formats
+============
+
+
+aeEngineConfig.xml
+------------------
+
+This file contains values that influence the behavior of the BPEL engine
+itself. It lives in the ActiveBPEL engine bpr directory. Configuration changes
+made and saved using the BpelAdmin page (normally found at
+http://localhost:8080/BpelAdmin/config.jsp) are saved to aeEngineConfig.xml.
+
+Online help about engine configuration is available by clicking the "Help"
+link at the bottom of the left-side menu on every BpelAdmin page.
+
+
+Process Deployment Descriptor (.pdd)
+------------------------------------
+
+For each BPEL process you want to deploy, you need to create a Process
+Deployment Descriptor (.pdd) file. This XML file tells the BPEL engine about
+your BPEL processes. Each process (each .bpel file) has its own .pdd file. The
+<process> element contains partner links and WSDL references.
+
+The schema for .pdd files lives at
+http://schemas.active-endpoints.com/pdd/2004/09/pdd.xsd.
+
+<process name="qname" location="relativeDeploymentLocation">
+  <partnerLinks>
+    <partnerLink name="ncname">
+      <partnerRole endpointReference="static|dynamic|invoker|principal">
+        [... endpoint reference....]?
+      </partnerRole>?
+      <myRole service="name" allowedRoles="namelist"? binding="MSG|RPC"/>?
+    </partnerLink>+
+  </partnerLinks>
+  <wsdlReferences>
+    <wsdl namespace="uri" location="uri"/>+
+  </wsdlReferences>?
+</process>
+
+relativeDeploymentLocation<span> is the path to a BPEL file, relative to the
+classpath. Normally, this will just be the name of a BPEL file that lives in
+the same directory as the .pdd file.
+
+Since qname is a qualified name, you may need an xmlns attribute to specify
+the namespace. For example,
+
+<process name="bpelns:loanApprover"
+    location="approver.bpel"
+    xmlns:bpelns="http://acme.com/loanprocessing">
+  <!-- ... -->
+</process>
+
+The partner links describe the roles taken on by each partner in the process.
+
+    Partner Role        Endpoint References
+    ------------        -------------------
+    static              Defined in deployment descriptor (BPEL4WS)
+    dynamic             Mapped in process (BPEL4WS)
+    invoker             Transmitted in SOAP headers of partner (WS-Addressing)
+    principal           Lookup from Partner Definition (.pdef) based on
+                        authenticated principal
+
+For example, the loan application BPEL process partner links look like this:
+
+<partnerLinks xmlns:lns="http://loans.org/wsdl/loan-approval">
+  <!-- Partner Link for inbound request from customer --> 
+  <partnerLink name="customer" type="lns:loanApprovalLinkType">
+    <myRole service="ApproveLoan" allowedRoles="" binding="RPC" />
+  </partnerLink>
+  <!-- Partner Link for outbound request to approver --> 
+  <partnerLink name="approver" type="lns:loanApprovalLinkType">
+    <partnerRole endpointReference="static">
+      <wsa:EndpointReference
+		xmlns:approver="http://tempuri.org/services/loanapprover">
+        <wsa:Address>approver:anyURI</wsa:Address>
+        <wsa:ServiceName
+		portName="SOAPPort">approver:LoanApprover</wsa:ServiceName>
+        </wsa:EndpointReference> 
+      </partnerRole>
+    </partnerLink>
+  <!-- Partner Link for outbound request to assessor --> 
+  <partnerLink name="assessor" type="lns:loanAssessorLinkType">
+    <partnerRole endpointReference="static">
+      <wsa:EndpointReference
+		xmlns:assessor='http://tempuri.org/services/loanassessor'>
+        <wsa:Address>assessor:anyURI</wsa:Address>
+        <wsa:ServiceName
+		portName="SOAPPort">assessor:LoanAssessor</wsa:ServiceName>
+        </wsa:EndpointReference>
+     </partnerRole>
+   </partnerLink>
+</partnerLinks>
+
+The <wsdlReferences> element lists any WSDL files referenced by the BPEL
+process. It is used by a BPEL engine to create in-memory representations of
+the WSDL. See the Architecture document for details. Here is the
+<wsdlReferences> element from the loan approval example:
+
+<wsdlReferences>
+  <wsdl namespace="http://tempuri.org/services/loandefinitions"
+         location="wsdl/loandefinitions.wsdl"/>
+  <wsdl namespace="http://loans.org/wsdl/loan-approval"
+         location="wsdl/loanapproval.wsdl"/>
+  <wsdl namespace="http://tempuri.org/services/loanapprover"
+         location="wsdl/loanapprover.wsdl"/>
+  <wsdl namespace="http://tempuri.org/services/loanassessor"
+         location="wsdl/loanassessor.wsdl"/>
+</wsdlReferences>
+
+
+wsdlCatalog.xml
+---------------
+
+The WSDL catalog provides a way for the BPEL engine to find WSDL files within
+a .bpr deployment archive. wsdlCatalog.xml lives in the META-INF directory.
+
+<wsdlCatalog>
+  <wsdlEntry location="string"
+	classpath="slash/separated/classpath/filename.wsdl"/>*
+</wsdlCatalog>
+
+
+The location attribute maps to a WSDL file in one of two ways. Its value is
+either:
+
+    * The location attribute of a <wsdl> element in the wsdlReferences section
+      of a .pdd file
+
+    * The location attribute of an <import> element in a WSDL file
+
+When loading a WSDL file at deployment time, the engine reads the WSDL
+references from the .pdd file and uses the location attribute of the <wsdl>
+element as a key into the WSDL catalog. If the WSDL catalog contains a
+matching location, the engine loads the WSDL from the corresponding classpath.
+If no mapping exists in the catalog, the engine assumes the location is an
+absolute URL and attempts to load the WSDL from that location.
+
+The classpath attribute indicates where the WSDL file lives in the .bpr file,
+relative to the root of the .bpr file's contents.
+
+Here is an examples wsdlCatalog.xml file. The locations and classpaths happen
+to be the same, because the .pdd file uses that string to identify the WSDL
+files.
+
+<wsdlCatalog>
+  <wsdlEntry location="wsdl/loanapproval.wsdl"
+            classpath="wsdl/loanapproval.wsdl"/>
+  <wsdlEntry location="wsdl/loanapprover.wsdl"
+            classpath="wsdl/loanapprover.wsdl"/>
+  <wsdlEntry location="wsdl/loanassessor.wsdl"
+            classpath="wsdl/loanassessor.wsdl"/>
+  <wsdlEntry location="wsdl/loandefinitions.wsdl"
+            classpath="wsdl/loandefinitions.wsdl"/>
+</wsdlCatalog>
+
+
+Partner Definition (.pdef)
+--------------------------
+
+<pre><partnerDefinition principal="name">
+  <partnerLinkType name="qname">
+    <role name="ncname" authtype="basic" username="xx" password="yy">
+      ... endpoint reference....
+    </role>*
+  </partnerLinkType>*
+</partnerDefinition></pre>
+
+Partner links describe relationships between partners. Partner definition
+files are not necessary for all BPEL processes, just those with
+principal-based enpoint reference mapping. When authentication is required,
+this file is used to provide the authentication information.

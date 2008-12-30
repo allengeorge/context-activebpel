@@ -1,0 +1,14 @@
+<html><body>
+This package contains the classes for reading and writing extension
+elements for BPEL.  Any element outside of the default BPEL (1.1)
+namespace is assumed to be an extension element.
+<br />
+The IAeExtensionElement interface provides the minimum amount
+of common information likely to be shared by all readers and
+writers.  It is assumed that custom readers/writers that
+are registered to handle specific extension elements will cast
+the generic interface to the appropriate impl.
+<br />
+A default reader/writer class is provided to handle all
+extension elements. 
+</body></html>

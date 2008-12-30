@@ -1,0 +1,6 @@
+<ae-seed-data>
+	<AeURNValues>
+      <URN>ae:localhost</URN>
+      <URL>http://localhost:8080/active-bpel/services/${urn.3}</URL>
+	</AeURNValues>
+</ae-seed-data>

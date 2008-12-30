@@ -1,0 +1,667 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<xs:schema xmlns:tsd = "http://namespaces.softwareag.com/tamino/TaminoSchemaDefinition" xmlns:xs = "http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:appinfo>
+      <tsd:schemaInfo name = "ActiveBPEL_schema">
+        <tsd:collection name = "ActiveBPEL_collection"></tsd:collection>
+        <tsd:doctype name = "AeMetaInfo">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:unique name = "UNQ_metainfo_prim_key">
+              <tsd:field xpath = "@name"></tsd:field>
+            </tsd:unique>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeAlarm">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:unique name = "UNQ_alarm_prim_key">
+              <tsd:field xpath = "ProcessID"></tsd:field>
+              <tsd:field xpath = "LocationPathID"></tsd:field>
+            </tsd:unique>
+            <tsd:systemGeneratedIdentity reuse = "false"></tsd:systemGeneratedIdentity>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeQueuedReceive">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:systemGeneratedIdentity reuse = "false"></tsd:systemGeneratedIdentity>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeVariable">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:unique name = "UNQ_variable_prim_key">
+              <tsd:field xpath = "ProcessID"></tsd:field>
+              <tsd:field xpath = "LocationPathID"></tsd:field>
+              <tsd:field xpath = "VersionNumber"></tsd:field>
+            </tsd:unique>
+            <tsd:systemGeneratedIdentity reuse = "false"></tsd:systemGeneratedIdentity>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeProcess">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:systemGeneratedIdentity reuse = "false"></tsd:systemGeneratedIdentity>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeProcessLog">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:systemGeneratedIdentity reuse = "false"></tsd:systemGeneratedIdentity>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeProcessJournal">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:systemGeneratedIdentity reuse = "false"></tsd:systemGeneratedIdentity>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeURNValues">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:unique name = "UNQ_urn_prim_key">
+              <tsd:field xpath = "URN"></tsd:field>
+            </tsd:unique>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeCoordination">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:doctype name = "AeReceivedItem">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+            <tsd:systemGeneratedIdentity reuse = "false"></tsd:systemGeneratedIdentity>
+          </tsd:logical>
+        </tsd:doctype>
+      </tsd:schemaInfo>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:complexType name = "AeQName">
+    <xs:sequence>
+      <xs:element name = "Namespace" type = "xs:anyURI">
+        <xs:annotation>
+          <xs:appinfo>
+            <tsd:elementInfo>
+              <tsd:physical>
+                <tsd:native>
+                  <tsd:index>
+                    <tsd:text></tsd:text>
+                  </tsd:index>
+                </tsd:native>
+              </tsd:physical>
+            </tsd:elementInfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name = "LocalPart" type = "xs:NCName">
+        <xs:annotation>
+          <xs:appinfo>
+            <tsd:elementInfo>
+              <tsd:physical>
+                <tsd:native>
+                  <tsd:index>
+                    <tsd:text></tsd:text>
+                  </tsd:index>
+                </tsd:native>
+              </tsd:physical>
+            </tsd:elementInfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name = "AeAny" mixed = "true">
+    <xs:sequence>
+      <xs:any processContents = "skip"></xs:any>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name = "AeAnyNullable">
+    <xs:sequence>
+      <xs:any processContents = "skip" minOccurs = "0"></xs:any>
+    </xs:sequence>
+    <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+  </xs:complexType>
+  <xs:element name = "AeMetaInfo">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base = "xs:string">
+          <xs:attribute name = "name" type = "xs:string" use = "required"></xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeProcess">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "PlanID" type = "xs:integer"></xs:element>
+        <xs:element name = "ProcessName" type = "AeQName"></xs:element>
+        <xs:element name = "ProcessDocument" type = "AeAnyNullable" minOccurs = "0"></xs:element>
+        <xs:element name = "ProcessState" minOccurs = "0">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:int">
+                <xs:attribute name = "ae-null" type = "xs:boolean"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name = "ProcessStateReason" minOccurs = "0">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:int">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name = "StartDate" minOccurs = "0">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:dateTime">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name = "EndDate" minOccurs = "0">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:dateTime">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name = "PendingInvokesCount">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:int">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name = "ModifiedDate" minOccurs = "0">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:dateTime">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name = "ModifiedCount" minOccurs = "0">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:int">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeProcessLog">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "ProcessID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "ProcessLog" type = "xs:string"></xs:element>
+        <xs:element name = "LineCount" type = "xs:integer"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeVariable">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "ProcessID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "LocationPathID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "VersionNumber" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "VariableDocument" type = "AeAnyNullable" minOccurs = "0"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeAlarm">
+    <xs:annotation>
+      <xs:appinfo>
+        <tsd:elementInfo>
+          <tsd:physical>
+            <tsd:native>
+              <tsd:index>
+                <tsd:standard>
+                  <tsd:field xpath = "ProcessID"></tsd:field>
+                  <tsd:field xpath = "GroupID"></tsd:field>
+                </tsd:standard>
+              </tsd:index>
+            </tsd:native>
+          </tsd:physical>
+        </tsd:elementInfo>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "ProcessID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "LocationPathID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "GroupID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "Deadline" type = "xs:dateTime"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeQueuedReceive">
+    <xs:annotation>
+      <xs:appinfo>
+        <tsd:elementInfo>
+          <tsd:physical>
+            <tsd:native>
+              <tsd:index>
+                <tsd:standard>
+                  <tsd:field xpath = "ProcessID"></tsd:field>
+                  <tsd:field xpath = "LocationPathID"></tsd:field>
+                </tsd:standard>
+                <tsd:standard>
+                  <tsd:field xpath = "ProcessID"></tsd:field>
+                  <tsd:field xpath = "GroupID"></tsd:field>
+                </tsd:standard>
+                <tsd:standard>
+                  <tsd:field xpath = "ProcessID"></tsd:field>
+                  <tsd:field xpath = "MatchHash"></tsd:field>
+                </tsd:standard>
+                <tsd:standard>
+                  <tsd:field xpath = "ProcessID"></tsd:field>
+                  <tsd:field xpath = "CorrelateHash"></tsd:field>
+                </tsd:standard>
+              </tsd:index>
+            </tsd:native>
+          </tsd:physical>
+        </tsd:elementInfo>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "ProcessID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "LocationPathID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "GroupID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "PartnerLinkName" type = "xs:string"></xs:element>
+        <xs:element name = "PortType" type = "AeQName"></xs:element>
+        <xs:element name = "Operation" type = "xs:string"></xs:element>
+        <xs:element name = "CorrelationProperties" type = "AeAny"></xs:element>
+        <xs:element name = "MatchHash" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "CorrelateHash" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "MessageExchange" minOccurs = "0">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:string">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeProcessJournal">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "ProcessID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "LocationPathID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "EntryType" type = "xs:short"></xs:element>
+        <xs:element name = "EntryDocument" type = "AeAnyNullable"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeURNValues">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "URN" type = "xs:string"></xs:element>
+        <xs:element name = "URL" type = "xs:string"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeCoordination">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "EngineID" type = "xs:integer"></xs:element>
+        <xs:element name = "CoordinationType" type = "xs:string"></xs:element>
+        <xs:element name = "CoordinationRole" type = "xs:unsignedShort"></xs:element>
+        <xs:element name = "CoordinationID" type = "xs:string">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "State" type = "xs:string">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "ProcessID" type = "xs:integer">
+          <xs:annotation>
+            <xs:appinfo>
+              <tsd:elementInfo>
+                <tsd:physical>
+                  <tsd:native>
+                    <tsd:index>
+                      <tsd:standard></tsd:standard>
+                    </tsd:index>
+                  </tsd:native>
+                </tsd:physical>
+              </tsd:elementInfo>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name = "LocationPath" type = "xs:string"></xs:element>
+        <xs:element name = "CoordinationDocument" type = "AeAnyNullable"></xs:element>
+        <xs:element name = "StartDate">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:dateTime">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name = "ModifiedDate">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base = "xs:dateTime">
+                <xs:attribute name = "ae-null" type = "xs:boolean" default = "false"></xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "AeReceivedItem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "ProcessID" type = "xs:integer"></xs:element>
+        <xs:element name = "LocationPathID" type = "xs:integer"></xs:element>
+        <xs:element name = "MessageDocument" type = "AeAny" minOccurs = "0"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

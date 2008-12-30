@@ -1,0 +1,277 @@
+ActiveBPEL Licensing Policies
+
+
+ActiveBPEL, LLC and its parent organization, Active Endpoints, Inc.,
+distribute the ActiveBPEL engine technology under two licensing options. You
+can use the ActiveBPEL engine under an Open Source License by downloading it
+from www.activebpel.org. Alternatively, you can acquire a Commercial License
+to Active Endpoints' ActiveWebflow products, which include the ActiveBPEL
+engine technology, by contacting Active Endpoints, Inc. at
+www.active-endpoints.com. The sections below are intended to provide you with
+information about our licensing policies so that you can determine which
+license is the best fit for your needs, and so that you can understand other
+important aspects of your ActiveBPEL engine license.
+
+
+1 - Licensing Introduction and Guidelines 
+
+ActiveBPEL, LLC and its parent organization, Active Endpoints, Inc., are
+committed to providing the open source community with world-class BPEL
+technologies. The ActiveBPEL engine represents commercial quality software
+that has been created by Web services pioneers with a deep understanding of
+BPEL and its predecessor specifications. We believe that the open source
+licensing option is an effective means through which to cultivate community
+interest, education and development around BPEL technologies.
+
+Our flexible licensing alternatives are intended to balance the following
+fundamental objectives:
+
+* Provide the open source community with premium quality BPEL technology 
+
+* Foster the ongoing evolution of the ActiveBPEL engine through community
+  contributions and through our own continued investments
+
+* Provide a means through which ActiveBPEL community members can quickly learn
+  about BPEL and evaluate its use for various purposes
+
+* Permit organizations to examine and test the quality of our technologies
+  prior to engaging in commercial relationships with us, when appropriate
+
+Below are some guidelines to help you determine which of our licensing
+alternatives might be the best fit for you. If you have questions about which
+license to use, you can contact us at license@activebpel.org.
+
+* If you license your software to others under the GNU General Public License
+  (GPL) as defined by the Free Software Foundation, then use ActiveBPEL, LLC’s
+  Open Source License.
+
+* If you wish to redistribute any of the ActiveBPEL engine technology with
+  your closed source "proprietary" software, and/or you require product-level
+  technical support, then you can purchase a commercial license for Active
+  Endpoints’ ActiveWebflow product.
+
+* If you wish to use high-productivity diagramming tools to create your BPEL
+  processes and deploy them to the ActiveBPEL engine, you can purchase a
+  commercial license for Active Endpoints’ ActiveWebflow product.
+
+In addition to the guidelines provided above, the sections that follow give
+more specific information about licensing, code contributions, and our
+policies on patents and trademarks. Please read these sections carefully, as
+they are intended to help you understand your responsibilities when you use
+the ActiveBPEL engine technology.
+
+
+2 - Open Source and Commercial Licenses 
+
+ActiveBPEL, LLC is an open source software organization that licenses and
+distributes the ActiveBPEL engine technology. The ActiveBPEL code base
+includes some of the software that is also available in Active Endpoints
+Inc.’s commercial software products. Active Endpoints, Inc. and ActiveBPEL,
+LLC together offer you two licensing options:
+
+* Open Source License. If you are developing open source applications,
+  ActiveBPEL, LLC distributes its ActiveBPEL engine technology primarily under
+  the GNU General Public License. However, because the ActiveBPEL engine
+  technology includes some software written and licensed by others, certain
+  parts of the ActiveBPEL technology are covered by other open source license
+  agreements, such as the Lesser GNU General Public License (LGPL). In this
+  Licensing Policies statement, the open source licenses that collectively
+  cover the ActiveBPEL engine’s technologies are referred to as the "Open
+  Source Licenses." To review the licenses that cover the various modules of
+  ActiveBPEL, see our Licensing Details. Making our product available under
+  Open Source Licenses allows you to freely modify our software and
+  redistribute it, as long as you do so under the terms of the Open Source
+  Licenses. The ActiveBPEL engine technology is licensed free of charge and is
+  provided "AS IS." Because the ActiveBPEL engine technology is offered free
+  of charge, ActiveBPEL, LLC does not take on any liability for performance or
+  intellectual property matters for this software.
+
+* Commercial Licenses. If you are developing commercial applications and/or
+  you require product technical support, Active Endpoints, Inc. licenses its
+  ActiveWebflow software suite (which includes the ActiveBPEL engine
+  technology as well as other proprietary technologies) under the terms of a
+  commercial, closed-source license agreement. ActiveWebflow is licensed for a
+  fee and includes customary commercial terms for support and intellectual
+  property liabilities. OEMs, resellers, systems integrators and government
+  users typically prefer a commercial license.
+
+If you are not sure which license to use, you can always test the ActiveBPEL
+engine under the GPL license and inspect the source code before you purchase a
+commercial license to ActiveWebflow.
+
+
+3 - Changes to Our Licensing Policies 
+
+We believe that our commercial and open source software communities can work
+together. We will be striving over time to streamline our licensing policies
+to provide the optimal balance of access to our open source products and
+commercial viability for our commercial products. We hope to achieve the
+maximum synergy between these two models: contributions from the open source
+community will help make our products robust and adaptable, and development
+resources from our privately-funded commercial operations will help fuel the
+development of our open source products.
+
+Because we want to accomplish this balance, the dual licensing policy of
+ActiveBPEL, LLC and Active Endpoints, Inc. is a work in progress. So, from
+time to time, we may change this policy. For instance, we may modify the Open
+Source License terms we offer. But, of course, if you receive a license to our
+code under an Open Source License, and we subsequently change our licensing
+policy, this will not terminate the rights you have already been granted. Any
+changes will be changes going forward.
+
+
+4 - Contributions and Code Base Sharing 
+
+We encourage contributions to our code base from the open source community.
+Like most open source projects, we will maintain the code base for our
+official releases; contributions you offer may or may not be included. Any
+code included in our open source code base will be made available under our
+Open Source License terms.
+
+However, because we also offer a commercial licensing model, we may use
+contributions to our open source code base in our commercially licensed
+products as well. We believe this is consistent with the spirit of free
+software, because nothing will prevent you from making your contributions
+available under open source licensing terms. We simply ask that you allow us
+to include your contributions in our commercial products as well.
+
+If you wish to contribute to the ActiveBPEL code base, you must agree to the
+terms of our Code Contribution Agreement. We cannot accept contributions
+unless you agree to these terms. This helps protect us, and the open source
+community, from liability for intellectual property infringement. It also
+ensures that we will not have to commit resources to legal disputes about code
+you contribute. We would rather use those resources to improve our software.
+
+
+5 - Patents 
+
+
+From time to time, Active Endpoints, Inc. and ActiveBPEL, LLC may file for and
+obtain patents in the United States or any other country. An important reason
+to pursue patents is to prevent others from bringing patent infringement
+lawsuits that would make our products unavailable under our Open Source
+Licenses. We will not exercise our patents to take a "second bite at the
+apple." In other words, if any code you received from us under an Open Source
+License falls within the scope of any claim of any of our patents, we will not
+use that patent to prevent you from exercising your license to that code. The
+following is a more formal declaration of our patent policy:
+
+To the extent you make, use, offer to sell, or sell products including or
+embodying software licensed to you by ActiveBPEL, LLC under an Open Source
+License and such software infringes any claim of any patent owned by Active
+Endpoints, Inc. or ActiveBPEL, LLC ("Active"), Active shall not enforce such
+patent against you in connection with such making, use, offer to sell or sale
+of such product. The foregoing does not apply if the infringement arises from
+modifications to the licensed software made by any party other than Active.
+The foregoing will be void with respect to you if you bring a patent
+infringement claim against Active or any of its affiliates (including without
+limitation cross-claims or counterclaims). The foregoing will not be construed
+as an assurance that such patents are enforceable or that the exercise of
+rights under such patents does not infringe the patent or other intellectual
+property rights of any other entity.
+
+The ActiveBPEL engine technology implements a standard called the Business
+Process Execution Language for Web Services (BPEL4WS, or BPEL, for short),
+which is a standard published by the Organization for the Advancement of
+Structured Information Standards (OASIS). Information about this standard is
+available at http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wsbpel
+. Some of the companies that participated in the development of that standard
+have made statements about the patent rights they own that cover this
+standard. http://www.oasis-open.org/committees/wsbpel/ipr.php. ActiveBPEL, LLC
+cannot control these policies, of course. Currently, no company has posted a
+patent policy demanding license fees to practice the standard. Some of the
+companies, however, have posted terms and conditions for a royalty-free patent
+license. We cannot control these terms and conditions. If you license the
+ActiveBPEL engine technology, you are responsible for complying with those
+terms if you wish to benefit from those patent licenses. Our Open Source
+Licenses do not grant any rights to these patents.
+
+
+6 - Trademarks 
+
+We offer our software under Open Source Licenses, so you will have the freedom
+to change it. But there is a difference between copyright in software and
+trademark rights. We strictly enforce our trademark rights - we must, in order
+to keep them valid. There are significant restrictions on your ability to use
+the ActiveBPEL, LLC name and logos, even when built into binaries that we
+provide.
+
+7 - Trademark Notices 
+
+You must not remove our trademarks from our binaries. You may truthfully state
+that an unmodified version of our software is ActiveBPEL software, as long as
+you include the appropriate notice language described below. However, if you
+are distributing copies over a Web site, we ask that you do this by providing
+a link directly to our site, rather than offering it on your own server. We
+require this because the speed and reliability of the server will bear upon
+our reputation and affect our rights in our trademark.
+
+In addition, you must insure that you are properly identifying ActiveBPEL, LLC
+as the source of the ActiveBPEL engine technology. Otherwise, you will be
+incorrectly implying that you are the source of our software. You must do this
+even if you have modified the ActiveBPEL software as allowed under the Open
+Source Licenses. Therefore, to avoid violating our trademark rights, you
+should use trademarks and notices as follows:
+
+* If you are redistributing unmodified versions of our software as made
+  available on our Web site, you must not remove our trademarks from
+  unmodified binaries. Thus, any of our notices or logos that are embedded in
+  the ActiveBPEL engine software must remain visible to the user.
+
+* If you are redistributing modified versions of our software, you must
+  include a notice stating: "This product includes software used under license
+  from ActiveBPEL, LLC, but it is not an ActiveBPEL product and has not been
+  tested, endorsed, or approved by ActiveBPEL, LLC."
+
+* If you are redistributing either unmodified or modified versions of the
+  ActiveBPEL technology, you must prominently place a notice saying "Powered
+  by ActiveBPEL" on the packaging, promotional content (e.g. brochures, press
+  releases, website copy), and about screens for your software. You must also
+  follow the Trademark Guidelines on the proper use of our trademarks.
+
+Our trademarks symbolize our reputation and identity, so their proper use is
+important. You would need a formal license from us in order to use our
+trademarks in a way that states or suggests that we sponsor, endorse, or are
+otherwise affiliated with your project or use. You do not need a formal
+license agreement in order to make purely informational references to our
+trademarks (such as in a product review or article), but even informational
+references should follow our Trademark Guidelines. Provided that you follow
+these guidelines, you may link to www.activebpel.org. However, the context and
+implementation of those links must make it clear that you are not endorsed by
+or affiliated with us, but are simply linking to our site or our software.
+Please e-mail us at trademarks@activebpel.org if you have any questions about
+the use of our trademarks.
+
+
+
+8 - Trademark Guidelines 
+
+The first or most prominent mention of our trademark, ActiveBPEL, as well as
+any of our other trademarks identified below, should be accompanied by the
+letters TM in superscript and an asterisk immediately to the right, e.g.:
+ACTIVEBPEL TM*. Somewhere nearby in legible typeface should be an asterisk
+with a notation reading: ACTIVEBPEL is a trademark of ActiveBPEL, LLC, and is
+used under license.
+
+We may register this (and other) trademarks in the future, at which time it
+would be appropriate to replace the TM symbol with the registered trademark
+symbol (®). We will post a notice here if this happens.
+
+It is not necessary to use trademark symbols at every mention of a mark in
+running text. Instead, the first and most prominent references to a particular
+mark such as in headers on a web page, the beginning and ending of
+presentations, login or welcome screens, product media, and advertising or
+promotional materials in all media.
+
+Trademarks Should Be Used as Adjectives and in Their Proper Form. Trademarks
+should be used as adjectives followed by a generic term for instance,
+ACTIVEBPEL engine technology. The spelling and syntax of marks should never be
+varied - no words should be omitted or abbreviated, nor should acronyms be
+used in place of specific marks.
+
+A current list of our trademarks appears below. Any questions about proper use
+for a specific display should be directed to trademarks@activebpel.org.
+
+List of Trademarks Currently Owned by ActiveBPEL, LLC:
+
+ActiveBPEL TM

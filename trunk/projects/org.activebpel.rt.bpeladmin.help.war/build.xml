@@ -1,0 +1,199 @@
+<project name="Auxiliary build file for the ActiveBpel Help WAR project" default="package" basedir=".">
+
+
+    <property name="root.dir" value="${basedir}/../.."/>
+    <property name="ae.dist" value="${root.dir}/dist"/>
+    <property name="ae.lib" value="${root.dir}/lib"/>
+    <property name="src.dir" value="${basedir}/src"/>
+    <property name="project" value="."/>
+    
+    <property name="xsl.dir" value="${basedir}/support/xsl"/>
+    <property name="xml.dir" value="${src.dir}/xml" />
+    <property name="html.dir" value="${basedir}/war" />
+    <property name="support.dir" value="${basedir}/war" />
+    <property name="images.dir" value="${src.dir}/framemaker/images" />
+    <property name="ae.network.backup" value="u:/"/>
+    <property name="ae.local.backup"   value="${java.io.tmpdir}"/>
+    
+    <property environment="env"/>
+   
+    <!-- building help requires a number of 3rdparty applications be installed that are not normally.
+       This includes FrameMaker 7.0, DocFrame, access to the saxon.jar file, and the dzbatcher application.
+       Use the fm_home environment variable to determine if we should just simply repackage or actually
+       generate the help from framemaker files.
+       -->
+    <condition property="fm.home" value="${env.FM_HOME}">
+          <isset property="env.FM_HOME"/>
+     </condition>
+    
+    
+     <tstamp>
+       <format property="ae.timestamp" pattern="yyyyMMddHHmm"/>
+     </tstamp>
+    
+    
+    <!-- sets up the path to saxon, which is the docframe preferred xsl transformer-->
+    <path id="saxon.path">
+        <fileset dir="${root.dir}/external/saxon">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+    
+    <!-- =========================================== -->
+    <!-- Clean Synonym                               -->
+    <!-- =========================================== -->
+    <target name="clean" depends="clean.html, clean.xml"/>
+   
+   
+    <!-- =========================================== -->
+    <!-- Removes generated html                      -->
+    <!-- =========================================== -->    
+    <target name="clean.html" description="removes previously generated output">
+        <delete failonerror="false" quiet="true">
+           <fileset dir="${html.dir}" includes="*.css,*.html,*.htm,*.jpg,*.gif" />
+           <fileset dir="tmp"/>
+           <fileset dir="." includes="images.lst"/>
+        </delete>
+    </target>
+
+    <!-- =========================================== -->
+    <!-- Removes generated xml                       -->
+    <!-- =========================================== -->    
+        <target name="clean.xml" description="removes previously generated output">
+        <delete failonerror="false">
+            <fileset dir="${xml.dir}" includes="*.css,*.html,*.htm,*.jpg,*.gif" />
+        </delete>
+    </target>
+
+   <!-- =========================================== -->
+   <!-- Creates any necessary directories           -->
+   <!-- =========================================== -->
+    <target name="init" description="creates necessary directories">
+        <mkdir dir="${xml.dir}" />
+        <mkdir dir="${html.dir}" />
+    </target>
+    
+   <!-- =========================================== -->
+   <!-- Uses framemaker and dzbatcher to convert fm -->
+   <!-- files to xml                                -->
+   <!-- =========================================== -->    
+    <target name="xml.conversion" if="fm.home">
+        <exec executable="${root.dir}/external/dzbatcher/dzbatcher.exe" dir="support">
+            <arg value="-v" />
+            <arg value="dzb.bat" />
+        </exec>
+    </target>
+    
+   <!-- =========================================== -->
+   <!-- Converts xml to html                        -->
+   <!-- =========================================== -->
+    <target name="html.conversion" if="fm.home">
+       
+        <!-- creates html files -->
+        <xslt basedir="${xml.dir}" style="${xsl.dir}/styles_ActiveBPEL.xsl" force="true" 
+            in="${xml.dir}/ActiveBPELServer.xml" out="temp.xml">
+            <classpath refid="saxon.path" />
+            <param name="outputDir" expression="${html.dir}"/>
+            <param name="maxSectionLevel" expression="2" />
+        </xslt>
+        
+        <copy toDir="${html.dir}">
+            <fileset dir="${src.dir}/framemaker/images" includes="*.gif"/>
+            <fileset dir="${xsl.dir}" includes="*.css"/>
+        </copy>
+        <delete file="temp.xml" failonerror="false"/>
+
+    </target>
+    
+    
+   <!-- =========================================== -->
+   <!-- Packaging for Documenation                  -->
+   <!-- if fm_home is set assume that we have all   -->
+   <!-- necessary components to generate, xml, and  -->
+   <!-- html                                        -->
+   <!-- =========================================== -->       
+   <target name="doc.package" if="fm.home" depends="clean,init,xml.conversion,html.conversion">
+   
+       <loadproperties srcFile="ae.build.properties"/>
+       
+       <war destfile="${output.jarfile}" webxml="metadata/web.xml">
+          <fileset dir="${html.dir}"/>
+      </war>
+      
+   </target>
+   
+   
+   
+   <!-- =========================================== -->
+   <!-- Packaging for others                        -->
+   <!-- This target is used when framemaker, etc    -->
+   <!-- are not available                           -->
+   <!-- =========================================== -->    
+   <target name="dev.package" description="Package the ActiveBpel Help WAR file." unless="fm.home" depends="init">
+       
+      <echo message="Unpacking ${base.war} file in staging directory..."/>
+      <mkdir dir="tmp" />
+      <unwar src="${base.war}" dest="tmp" />
+
+      <echo message="Creating the ${output.jarfile} file..."/>
+      
+      <copy toDir="tmp" overwrite="true" preservelastmodified="true">
+        <fileset dir="${xsl.dir}" includes="*.css" />
+        <fileset dir="${src.dir}/framemaker/images" includes="*.gif" />
+        <fileset dir="${html.dir}" includes="*.html" />
+      </copy>
+
+      <copy toDir="tmp" overwrite="true">
+        <fileset dir="war"/>
+      </copy>
+      
+      <war destfile="${ae.dist}/${output.jarfile}" update="false" webxml="metadata/web.xml">
+         <fileset dir="tmp" excludes="**/web.xml"/>
+      </war>
+
+      <echo message="Removing staging directory..."/>
+      <delete dir="tmp" />
+      
+   </target>
+   
+   
+       
+   <!-- =========================================== -->
+   <!-- The following targets are helpers into the  -->
+   <!-- regular development build process           -->
+   <!-- =========================================== -->    
+    <target name="backup">
+    
+        <zip destfile="${ae.local.backup}/activebpel.doc.${ae.timestamp}.zip">
+            <fileset dir="."/>
+        </zip>
+        <copy file="${ae.local.backup}/activebpel.doc.${ae.timestamp}.zip" toDir="${ae.network.backup}"/>
+        
+    </target>
+
+    <target name="checkin.start">
+ 	<ant dir="${root.dir}/projects" antfile="support/build.xml" target="checkin.start"/> 
+    </target>
+    <target name="checkin" depends="backup">
+    
+        <ant dir="${root.dir}/projects" antfile="support/build.xml" target="checkin" inheritAll="false">
+            <property name="project" value="org.activebpel.rt.bpeladmin.help.war"/>
+        </ant>
+        
+    </target>
+    
+    <target name="checkins.done">
+    	<ant dir="${root.dir}/projects" antfile="support/build.xml" target="checkins.done">
+	      <property name="project" value="org.activebpel.rt.bpeladmin.help.war"/>
+    </ant>
+    </target>
+
+    <target name="xml" depends="clean.xml,init,xml.conversion, package" />
+    <target name="html" depends="clean.html,init,html.conversion, package" />
+    <target name="all" depends="clean,init,xml.conversion,html.conversion,package" />
+    <target name="package" depends="dev.package, doc.package"/>
+       
+   
+
+
+</project>
