@@ -1,0 +1,1001 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   This is the tamino XQuery configuration file for the Active BPEL
+   engine.  This file contains XQuery statements used by the Active
+   BPEL Tamino based persistence layer.
+   
+   Note that many of the statements below use CDATA segments.  This
+   is because they often have embedded XML markup and for readability
+   we don't want to escape them.
+-->
+<tamino-config>
+   <xquery-statements>
+
+      <!-- =========================== -->
+      <!-- Tamino Validator Statements -->
+      <!-- =========================== -->
+      <xquery-statement>
+         <name>Validator.GetVersion</name>
+         <comment>
+            Returns the databse version number.  The version number is stored as an instance
+            of the AeMetaInfo doc type.  The @name of the doc instance is "Version" and the
+            value is the version number.
+         </comment>
+         <xquery>
+            input()/AeMetaInfo[@name = 'Version']/text()
+         </xquery>
+      </xquery-statement>
+
+      <!-- ==================== -->
+      <!-- Installer Statements -->
+      <!-- ==================== -->
+      <xquery-statement>
+         <name>Installer.InsertVersion</name>
+         <comment>
+            Inserts the version number into the database.
+         </comment>
+         <xquery><![CDATA[
+            <AeMetaInfo name="Version">{0}</AeMetaInfo>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>Installer.Clean</name>
+         <comment>
+            Cleans all doc instances from the database. (use with care)
+         </comment>
+         <xquery><![CDATA[
+            for $obj in input()/* do delete $obj/..
+         ]]></xquery>
+      </xquery-statement>
+
+      <!-- ==================== -->
+      <!-- Upgrader Statements -->
+      <!-- ==================== -->
+      <xquery-statement>
+         <name>Upgrader.GetCurrentDBVersion</name>
+         <comment>
+            Cleans all doc instances from the database. (use with care)
+         </comment>
+         <xquery><![CDATA[
+            input()/AeMetaInfo[@name = "Version"]
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>Upgrader.SetCurrentDBVersion</name>
+         <comment>
+            Updates the version number in the database.
+         </comment>
+         <xquery><![CDATA[
+            update for $version in input()/AeMetaInfo[ @name = "Version" ]
+            do replace $version with <AeMetaInfo name="Version">{0}</AeMetaInfo>
+         ]]></xquery>
+      </xquery-statement>
+
+      <!-- ========================= -->
+      <!-- JournalStorage Statements -->
+      <!-- ========================= -->
+      <xquery-statement>
+         <name>JournalStorage.DeleteJournalEntry</name>
+         <comment>
+            Deletes a single journal entry given its id (ino:id).
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            update for $jnl in input()/AeProcessJournal
+            let $journalId := tf:getInoId($jnl)
+            where $journalId = {0,number,#}
+            do (
+               delete $jnl/..
+            )
+         ]]></xquery>
+      </xquery-statement>
+
+      <!-- ======================= -->
+      <!-- QueueStorage Statements -->
+      <!-- ======================= -->
+      <xquery-statement>
+         <name>QueueStorage.InsertAlarm</name>
+         <comment>
+            Inserts an alarm in the database.  An alarm is stored as an instance of the 
+            AeAlarm doc type.
+         </comment>
+         <xquery><![CDATA[
+            <AeAlarm>
+               <ProcessID>{0,number,#}</ProcessID>
+               <LocationPathID>{1,number,#}</LocationPathID>
+               <GroupID>{2,number,#}</GroupID>
+               <AlarmID>{3,number,#}</AlarmID>
+               <Deadline>{4}</Deadline>
+            </AeAlarm>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.DeleteAlarm</name>
+         <comment>
+            Deletes an alarm from the database.  This is done by removing the doc instance
+            of type AeAlarm that has a given ProcessID, LocationPathID and AlarmID.
+         </comment>
+         <xquery><![CDATA[
+            update for $alarm in input()/AeAlarm
+            where $alarm/ProcessID = {0,number,#}
+               and $alarm/LocationPathID = {1,number,#}
+               and $alarm/AlarmID = {2,number,#}
+            do delete $alarm/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.DeleteAlarmsByGroupId</name>
+         <comment>
+            Deletes alarms from the database that are associated with a particular group id.
+            This is done by removing the doc instance(s) of type AeAlarm that have the given
+            ProcessID and GroupID.
+         </comment>
+         <xquery><![CDATA[
+            update for $alarm in input()/AeAlarm
+            where $alarm/ProcessID = {0,number,#}
+               and $alarm/GroupID = {1,number,#}
+            do delete $alarm/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetAlarms</name>
+         <comment>
+            Gets all instances of the AeAlarm doc type.  This is typically used for recovery
+            purposes when the engine starts.
+         </comment>
+         <xquery><![CDATA[
+            input()/AeAlarm
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetAlarmsFiltered.decl</name>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            declare namespace xsd = "http://www.w3.org/2001/XMLSchema"
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetAlarmsFiltered.for</name>
+         <comment>
+            Gets a list of instances of the virtual AeAlarmExt doc type.  The 'where' 
+            clause of this FLWOR statement will be generated in Java code based on a 
+            query filter.
+         </comment>
+         <xquery><![CDATA[
+            for $alarm in input()/AeAlarm sort by (ProcessID ascending)
+            let $pid := $alarm/ProcessID
+            let $proc := input()/AeProcess[ tf:getInoId(.) = $pid ]
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetAlarmsFiltered.return</name>
+         <comment>
+            The return value for the above GetAlarmsFiltered query.
+         </comment>
+         <xquery><![CDATA[
+            return
+              <AeAlarmExt>
+                 { $alarm/* }
+                 { $proc/ProcessName }
+              </AeAlarmExt>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetCorrelatedReceives</name>
+         <comment>
+            Gets all of the correlated recieve instances given a match hash value and
+            correlation hash value.  The return value is a queued receive, which 
+            additionally includes the queued receive ID (ino:id) and associated process 
+            name.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $rec in input()/AeQueuedReceive
+            let $procId := $rec/ProcessID
+            let $proc := input()/AeProcess[ tf:getInoId(.) = $procId ]
+            where $rec/MatchHash = {0,number,#} and $rec/CorrelateHash = {1,number,#}
+            return 
+               <AeQueuedReceive>
+                  <QueuedReceiveID>'{ tf:getInoId($rec) }'</QueuedReceiveID>
+                  '{ $rec/* }'
+                  '{ $proc/ProcessName }'
+               </AeQueuedReceive>
+            ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetConflictingReceives</name>
+         <comment>
+            Gets a list of conflicting receive instances for a given process id.  The 
+            conflicting receives are any receive with the same process id and match 
+            hash.  The return value is a queued receive, which additionally includes 
+            the queued receive ID (ino:id) and associated process name.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $rec in input()/AeQueuedReceive
+            let $procId := $rec/ProcessID
+            let $proc := input()/AeProcess[ tf:getInoId(.) = $procId ]
+            where $rec/ProcessID = {0,number,#} and $rec/MatchHash = {1,number,#}
+            return 
+               <AeQueuedReceive>
+                  <QueuedReceiveID>'{ tf:getInoId($rec) }'</QueuedReceiveID>
+                  '{ $rec/* }'
+                  '{ $proc/ProcessName }'
+               </AeQueuedReceive>
+            ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.DeleteQueuedReceiveById</name>
+         <comment>
+            Deletes an AeQueuedReceive doc instances by its ino:id.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            update for $rec in input()/AeQueuedReceive
+            where tf:getInoId($rec) = {0,number,#}
+            do delete $rec/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.DeleteQueuedReceivesByGroup</name>
+         <comment>
+            Deletes queued receives in a given process by their group ID.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            update for $rec in input()/AeQueuedReceive
+            where $rec/ProcessID = {0,number,#}
+               and $rec/GroupID = {1,number,#}
+            do delete $rec/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetQueuedReceive</name>
+         <comment>
+            Gets a single queued receive instance given the process id and location path id.
+            The return value additionally includes the queued receive id (ino:id) and the
+            process name.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $rec in input()/AeQueuedReceive
+            let $procId := $rec/ProcessID
+            let $proc := input()/AeProcess[ tf:getInoId(.) = $procId ]
+            where $rec/ProcessID = {0,number,#} and $rec/LocationPathID = {1,number,#}
+            return
+               <AeQueuedReceive>
+                  <QueuedReceiveID>'{ tf:getInoId($rec) }'</QueuedReceiveID>
+                  '{ $rec/* }'
+                  '{ $proc/ProcessName }'
+               </AeQueuedReceive>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetQueuedReceivesFiltered.decl</name>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetQueuedReceivesFiltered.for</name>
+         <comment>
+            Gets a filtered list of queued receive instances.  The return value additionally 
+            includes the queued receive id (ino:id) and the process name.  The 'where' clause
+            for this FLWOR expression will be generated in Java code based on a filter.
+         </comment>
+         <xquery><![CDATA[
+            for $rec in input()/AeQueuedReceive
+            let $procId := $rec/ProcessID
+            let $proc := input()/AeProcess[ tf:getInoId(.) = $procId ]
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>QueueStorage.GetQueuedReceivesFiltered.return</name>
+         <comment>
+            The return portion of the above GetQueuedReceivesFiltered FLWOR expression.
+         </comment>
+         <xquery><![CDATA[
+            return 
+               <AeQueuedReceive>
+                  <QueuedReceiveID>{ tf:getInoId($rec) }</QueuedReceiveID>
+                  { $rec/* }
+                  { $proc/ProcessName }
+               </AeQueuedReceive>
+         ]]></xquery>
+      </xquery-statement>
+
+      <!-- ========================= -->
+      <!-- ProcessStorage Statements -->
+      <!-- ========================= -->
+      <xquery-statement>
+         <name>ProcessStorage.GetJournalEntries</name>
+         <comment>This query returns a list of Journal Entries for the given ProcessID.</comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $entry in input()/AeProcessJournal
+            let $jid := tf:getInoId($entry)
+            where $entry/ProcessID = {0,number,#}
+            return
+               <JournalEntry>
+                 <JournalID>'{ $jid }'</JournalID>
+                 '{ $entry/* }'
+               </JournalEntry>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetJournalEntriesLocationIds</name>
+         <comment>This query returns a list of Journal Entry location IDs.</comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $entry in input()/AeProcessJournal
+            let $jid := tf:getInoId($entry)
+            where $entry/ProcessID = {0,number,#}
+            return
+               <JournalEntry>
+                 <JournalID>'{ $jid }'</JournalID>
+                 '{ $entry/LocationPathID }'
+               </JournalEntry>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetJournalEntry</name>
+         <comment>This query returns a single Journal Entry by its JournalID.</comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $entry in input()/AeProcessJournal
+            let $jid := tf:getInoId($entry)
+            where $jid = {0,number,#}
+            return
+               <JournalEntry>
+                 <JournalID>'{ $jid }'</JournalID>
+                 '{ $entry/* }'
+               </JournalEntry>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetMaxProcessID</name>
+         <comment>This query returns the max process ID.</comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            <MaxProcessID>{ max( for $proc in input()/AeProcess return tf:getInoId($proc) ) }</MaxProcessID>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetMinProcessID</name>
+         <comment>This query gets the min process ID.</comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            <MinProcessID>{ min( for $proc in input()/AeProcess return tf:getInoId($proc) ) }</MinProcessID>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessList.decl</name>
+         <xquery><![CDATA[
+            declare namespace xsd = "http://www.w3.org/2001/XMLSchema"
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessList.for</name>
+         <comment>
+            Gets a filtered list of (virtual) process detail instances.  The return value includes
+            some elements from the AeProcess doc type as well as the process id (ino:id). The 
+            'where' clause for this FLWOR expression will be generated in Java code based on a 
+            filter.
+         </comment>
+         <xquery><![CDATA[
+            for $proc in input()/AeProcess sort by (StartDate descending)
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessList.return</name>
+         <comment>
+            The return portion of the above GetProcessList FLWOR expression.
+         </comment>
+         <xquery><![CDATA[
+            return
+               <AeProcessInstanceDetail>
+                  <ProcessID>{ tf:getInoId($proc) }</ProcessID>
+                  { $proc/ProcessName }
+                  { $proc/ProcessState }
+                  { $proc/ProcessStateReason }
+                  { $proc/StartDate }
+                  { $proc/EndDate }
+                  { $proc/PlanID }
+               </AeProcessInstanceDetail>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessList.update</name>
+         <comment>
+            This is the update portion of a Tamino XQuery update query.  The update query will be 
+            used to select all of the document instances that will be deleted.  The where clause,
+            once again, will be generated in code.
+         </comment>
+         <xquery><![CDATA[
+            update for $proc in input()/AeProcess
+            let $procId := tf:getInoId($proc)
+            let $logs := for $log in input()/AeProcessLog where $log/ProcessID = $procId return $log
+            let $vars := for $var in input()/AeVariable where $var/ProcessID = $procId return $var
+            let $alarms := for $alarm in input()/AeAlarm where $alarm/ProcessID = $procId return $alarm
+            let $recs := for $rec in input()/AeQueuedReceive where $rec/ProcessID = $procId return $rec
+            let $jitems := for $jitem in input()/AeProcessJournal where $jitem/ProcessID = $procId return $jitem
+            let $coords := for $coord in input()/AeCoordination where $coord/ProcessID = $procId return $coord
+            let $attachments := (
+               for $procAttachment in input()/AeProcessAttachment
+               let $procAttachmentId := tf:getInoId($procAttachment)
+               where $procAttachment/ProcessID = $procId 
+               return ($procAttachment, 
+                  for $attachment in input()/AeAttachment
+                  let $nonXml := input()/AeNonXMLContent[tf:getInoId(.) = $attachment/AttachmentContentID]
+                  where $attachment/AttachmentGroupID = $procAttachmentId
+                  return ($attachment, $nonXml)
+               ))
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessList.do</name>
+         <comment>
+            This is the 'do' portion of a Tamino XQuery update query.  This portion of the query
+            will specify in what way to update the selected doc instances.  In this case, it 
+            specifies which ones to delete.
+         </comment>
+         <xquery><![CDATA[
+            do (
+               delete $proc/..
+               delete $logs/..
+               delete $vars/..
+               delete $alarms/..
+               delete $recs/..
+               delete $jitems/..
+               delete $coords/..
+               delete $attachments/..
+            )
+         ]]></xquery>
+      </xquery-statement>
+
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessIds.decl</name>
+         <xquery><![CDATA[
+            declare namespace xsd = "http://www.w3.org/2001/XMLSchema"
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessIds.for</name>
+         <comment>
+            Gets a filtered list of (virtual) process detail instances.  The return value includes
+            some elements from the AeProcess doc type as well as the process id (ino:id). The 
+            'where' clause for this FLWOR expression will be generated in Java code based on a 
+            filter.
+         </comment>
+         <xquery><![CDATA[
+            for $proc in input()/AeProcess
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessIds.return</name>
+         <comment>
+            The return portion of the above GetProcessIds FLWOR expression.
+         </comment>
+         <xquery><![CDATA[
+            return
+               <ProcessID>{ tf:getInoId($proc) }</ProcessID>
+         ]]></xquery>
+      </xquery-statement>
+
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessInstanceDetail</name>
+         <comment>
+            Gets a single instance of the (virtual) doc type AeProcessInstanceDetail.  The 
+            instance is selected by its process id (ino:id).
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $proc in input()/AeProcess
+            where tf:getInoId($proc) = {0,number,#}
+            return
+               <AeProcessInstanceDetail>
+                  <ProcessID>'{ tf:getInoId($proc) }'</ProcessID>
+                  '{ $proc/ProcessName }'
+                  '{ $proc/ProcessState }'
+                  '{ $proc/ProcessStateReason }'
+                  '{ $proc/StartDate }'
+                  '{ $proc/EndDate }'
+                  '{ $proc/PlanID }'
+               </AeProcessInstanceDetail>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetProcessName</name>
+         <comment>
+            Gets the process name of a single instance of the AeProcess type.  The instance
+            is selected by its process id (ino:id).
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $proc in input()/AeProcess
+            where tf:getInoId($proc) = {0,number,#}
+            return
+               $proc/ProcessName
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.DeleteProcess</name>
+         <comment>
+            Deletes a single AeProcess instance by its process id (ino:id).
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            update for $proc in input()/AeProcess
+            let $procId := tf:getInoId($proc)
+            let $logs := for $log in input()/AeProcessLog where $log/ProcessID = $procId return $log
+            let $vars := for $var in input()/AeVariable where $var/ProcessID = $procId return $var
+            let $alarms := for $alarm in input()/AeAlarm where $alarm/ProcessID = $procId return $alarm
+            let $recs := for $rec in input()/AeQueuedReceive where $rec/ProcessID = $procId return $rec
+            let $jitems := for $jitem in input()/AeProcessJournal where $jitem/ProcessID = $procId return $jitem
+            let $coords := for $coord in input()/AeCoordination where $coord/ProcessID = $procId return $coord
+            where $procId = {0,number,#}
+            do (
+               delete $proc/..
+               delete $logs/..
+               delete $vars/..
+               delete $alarms/..
+               delete $recs/..
+               delete $jitems/..
+               delete $coords/..
+            )
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.DeleteProcessLog</name>
+         <comment>
+            Deletes all process log instances for a given process (by ProcessID).
+         </comment>
+         <xquery><![CDATA[
+            update for $log in input()/AeProcessLog
+            where $log/ProcessID = {0,number,#}
+            do delete $log/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetRecoveryProcessIds</name>
+         <comment>
+            Gets a list of all recovery process ids.  This includes the process id for any 
+            AeProcess instance with pending invokes as well as the process id for any 
+            instance of AeProcessJournal.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            declare namespace xf = "http://www.w3.org/2002/08/xquery-functions"
+            xf:distinct-values(
+               (
+                  for $proc in input()/AeProcess[PendingInvokesCount > 0]
+                  return 
+                     <ProcessID>{ tf:getInoId($proc) }</ProcessID>
+               )
+               union
+               (
+                  input()/AeProcessJournal/ProcessID
+               )
+            )
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetLogEntries</name>
+         <comment>
+            Gets all instances of the (virtual) doc type LogItem for a given process id.  The
+            LogItem doc type is created from the LineCount of an AeProcessLog instance and the
+            ino:id of that instance.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $log in input()/AeProcessLog
+            where $log/ProcessID = {0,number,#}
+            return
+               <LogItem>
+                  <LogID>'{ tf:getInoId($log) }'</LogID>
+                  '{ $log/LineCount }'
+               </LogItem>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetSmallLog</name>
+         <comment>
+            Returns all LogItem instances for a given process id.  This is used when there are a
+            'small' number of instances of AeProcessLog for a given process.
+         </comment>
+         <xquery><![CDATA[
+            for $log in input()/AeProcessLog
+            where $log/ProcessID = {0,number,#}
+            return
+               <LogItem>
+                  '{ $log/ProcessLog }'
+               </LogItem>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetLogHead</name>
+         <comment>
+            Gets a list of LogItem instances for a given process id with an ino:id less than
+            a given value.  This is used when there are a lot of instances of AeProcessLog for
+            a given process.  In that case, only the HEAD and the TAIL of the log are returned.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $log in input()/AeProcessLog
+            where $log/ProcessID = {0,number,#} and tf:getInoId($log) < {1,number,#}
+            return
+               <LogItem>
+                  '{ $log/ProcessLog }'
+               </LogItem>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetLogTail</name>
+         <comment>
+            Gets a list of LogItem instances for a given process id with an ino:id less than
+            a given value.  This is used when there are a lot of instances of AeProcessLog for
+            a given process.  In that case, only the HEAD and the TAIL of the log are returned.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $log in input()/AeProcessLog
+            where $log/ProcessID = {0,number,#} and tf:getInoId($log) > {1,number,#}
+            return
+               <LogItem>
+                  '{ $log/ProcessLog }'
+               </LogItem>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetLogIDs</name>
+         <comment>
+            Gets a list of log ids for the instances of AeProcessLog for a given process.  This
+            list of IDs is then used to determine the parameters for the above HEAD/TAIL query
+            of the log (for large logs).
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $log in input()/AeProcessLog
+            where $log/ProcessID = {0,number,#}
+            return
+               <LogItem>
+                  <LogID>'{ tf:getInoId($log) }'</LogID>
+               </LogItem>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStorage.GetLog</name>
+         <comment>
+            Gets a single instance of AeProcessLog (only the ProcessLog element) by the log id (ino:id).
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            for $log in input()/AeProcessLog
+            where tf:getInoId($log) = {0,number,#}
+            return
+               <Log>
+                  '{ $log/ProcessLog }'
+               </Log>
+         ]]></xquery>
+      </xquery-statement>
+
+      <!-- ================================= -->
+      <!-- ProcessStateConnection Statements -->
+      <!-- ================================= -->
+      <xquery-statement>
+         <name>ProcessStateConnection.DeleteJournalEntries</name>
+         <comment>
+            Deletes a number of journal entries from the process journal.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            update for $jitem in input()/AeProcessJournal
+            let $journalid := tf:getInoId($jitem)
+		    {0}
+            do delete $jitem/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStateConnection.GetProcessDocument</name>
+         <comment>
+            Returns only the process document for a specific process.  This process is selected
+            by its ProcessID.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            input()/AeProcess[tf:getInoId(.) = {0,number,#}]/ProcessDocument
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStateConnection.GetVariableDocument</name>
+         <comment>
+            Returns a single variable document.  The variable document to be returned is selected
+            by the ProcessID of the process it belongs to, the LocationPathID of the variable, 
+            and the VersionNumber of the variable.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            input()/AeVariable[ProcessID = {0,number,#} and LocationPathID = {1,number,#} and VersionNumber = {2,number,#}]/VariableDocument
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStateConnection.GetProcessVariables</name>
+         <comment>
+            Gets all of the process variables for a given process (selected by the ProcessID of
+            the process).  The LocationPathID and VersionNumber of each process variable is
+            returned, but not the ProcessDocument.
+         </comment>
+         <xquery><![CDATA[
+            for $var in input()/AeVariable
+            where $var/ProcessID = {0,number,#}
+            return
+               <VariableInfo>
+                  '{ $var/LocationPathID }'
+                  '{ $var/VersionNumber }'
+               </VariableInfo>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStateConnection.DeleteVariable</name>
+         <comment>
+            Deletes a single variable from the database.  The variable is reference by its
+            ProcessID, LocationPathID, and VersionNumber (which is the AeVariable doc type's
+            unique key).
+         </comment>
+         <xquery><![CDATA[
+            update for $var in input()/AeVariable
+            where $var/ProcessID = {0,number,#}
+               and $var/LocationPathID = {1,number,#}
+               and $var/VersionNumber = {2,number,#}
+            do delete $var/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStateConnection.UpdateProcess</name>
+         <comment>
+            Updates an existing process in the database.  The process to update is selected by
+            its id.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            update for $proc in input()/AeProcess
+            let $procId := tf:getInoId($proc)
+            let $procDoc := $proc/ProcessDocument
+            let $procState := $proc/ProcessState
+            let $procStateReason := $proc/ProcessStateReason
+            let $startDate := $proc/StartDate
+            let $modDate := $proc/ModifiedDate
+            let $piCount := $proc/PendingInvokesCount
+            where $procId = {0,number,#}
+            do ( replace $procDoc with <ProcessDocument>{1}</ProcessDocument>
+                 replace $procState with <ProcessState>{2,number,#}</ProcessState>
+                 replace $procStateReason with <ProcessStateReason>{3,number,#}</ProcessStateReason>
+                 replace $startDate with <StartDate>{4}</StartDate>
+                 replace $modDate with <ModifiedDate>{5}</ModifiedDate>
+                 replace $piCount with <PendingInvokesCount>{6,number,#}</PendingInvokesCount> )
+           ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>ProcessStateConnection.UpdateProcessEndDate</name>
+         <comment>
+            Updates an existing process's end date in the database.
+         </comment>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            update for $proc in input()/AeProcess
+            let $endDate := $proc/EndDate
+            where tf:getInoId($proc) = {0,number,#}
+            do replace $endDate with <EndDate>{1}</EndDate>
+           ]]></xquery>
+      </xquery-statement>
+
+      <!-- ====================== -->
+      <!-- URN Storage Statements -->
+      <!-- ====================== -->
+      <xquery-statement>
+         <name>URNStorage.GetMappings</name>
+         <xquery><![CDATA[
+            input()/AeURNValues
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>URNStorage.UpdateMapping</name>
+         <xquery><![CDATA[
+            update for $urnVal in input()/AeURNValues
+            let $url := $urnVal/URL
+            where $urnVal/URN = "{0}"
+            do replace $url with <URL>{1}</URL>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>URNStorage.DeleteMapping</name>
+         <xquery><![CDATA[
+            update for $urnVal in input()/AeURNValues
+            where $urnVal/URN = "{0}"
+            do delete $urnVal/..
+         ]]></xquery>
+      </xquery-statement>
+
+      <!-- =============================== -->
+      <!-- Coordination Storage Statements -->
+      <!-- =============================== -->
+      <xquery-statement>
+         <name>CoordinationStorage.UpdateState</name>
+         <comment>Updates the state and modified date elements of a single AeCoordination instance.</comment>
+         <xquery><![CDATA[
+            update for $coord in input()/AeCoordination
+            let $state := $coord/State
+            let $modDate := $coord/ModifiedDate
+            where $coord/CoordinationID = "{0}"
+               and $coord/ProcessID = {1,number,#}
+            do ( replace $state with <State>{2}</State>
+                 replace $modDate with <ModifiedDate>{3}</ModifiedDate> )
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.UpdateContext</name>
+         <comment>Updates the coordination document element of a single AeCoordination instance.</comment>
+         <xquery><![CDATA[
+            update for $coord in input()/AeCoordination
+            let $coordDoc := $coord/CoordinationDocument
+            where $coord/CoordinationID = "{0}"
+               and $coord/ProcessID = {1,number,#}
+            do replace $coordDoc with <CoordinationDocument>{2}</CoordinationDocument>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.ListByCoordinationId</name>
+         <comment>
+            Gets a list of all instances of the AeCoordination doc type that have the 
+            given coordination id.
+         </comment>
+         <xquery><![CDATA[
+            input()/AeCoordination[ CoordinationID = "{0}" ]
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.ListByProcessId</name>
+         <comment>
+            Gets a list of all instances of the AeCoordination doc type that have the 
+            given process id.
+         </comment>
+         <xquery><![CDATA[
+            input()/AeCoordination[ ProcessID = {0,number,#} ]
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.LookupCoordination</name>
+         <comment>
+            Gets a single coordination instance document identified by its coordination 
+            id and process id.
+         </comment>
+         <xquery><![CDATA[
+            input()/AeCoordination[ CoordinationID = "{0}" and ProcessID = {1,number,#} ]
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.DeleteCoordination</name>
+         <xquery><![CDATA[
+            update for $coord in input()/AeCoordination
+            where $coord/CoordinationID = "{0}"
+               and $coord/ProcessID = {1,number,#}
+            do delete $coord/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.DeleteByProcessId</name>
+         <xquery><![CDATA[
+            update for $coord in input()/AeCoordination
+            where $coord/ProcessID = {0,number,#}
+            do delete $coord/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.DeleteByCoordinationId</name>
+         <xquery><![CDATA[
+            update for $coord in input()/AeCoordination
+            where $coord/CoordinationID = "{0}"
+            do delete $coord/..
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.ListCoordinatorsForProcessId</name>
+         <xquery><![CDATA[
+            for $coordA in input()/AeCoordination,
+                $coordB in input()/AeCoordination
+            where $coordA/CoordinationID = $coordB/CoordinationID
+               and $coordA/CoordinationRole = 0
+               and $coordB/CoordinationRole = 1
+               and $coordB/ProcessID = {0,number,#}
+            return $coordA
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>CoordinationStorage.ListParticipantsForProcessId</name>
+         <xquery><![CDATA[
+            for $coordA in input()/AeCoordination,
+                $coordB in input()/AeCoordination
+            where $coordA/CoordinationID = $coordB/CoordinationID
+               and $coordA/CoordinationRole = 0
+               and $coordB/CoordinationRole = 1
+               and $coordA/ProcessID = {0,number,#}
+            return $coordB
+         ]]></xquery>
+      </xquery-statement>
+
+      <!-- ====================================== -->
+      <!-- TransmissionTracker Storage Statements -->
+      <!-- ====================================== -->
+      <xquery-statement>
+         <name>TransmissionTrackerStorage.GetEntry</name>
+         <comment>Retrieves an entry given transmission id</comment>
+         <xquery><![CDATA[
+            input()/AeTransmissionTracker[ TransmissionId = {0,number,#} ]
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>TransmissionTrackerStorage.UpdateEntry</name>
+         <comment>Updates entry state and message id given transmission id</comment>
+         <xquery><![CDATA[
+            update for $transrec in input()/AeTransmissionTracker
+            let $state := $transrec/State
+            let $messageid := $transrec/MessageId
+            where $transrec/TransmissionId = {2,number,#}
+            do ( replace $state with <State>{0,number,#}</State>
+                 replace $messageid with <MessageId>{1}</MessageId> )
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>TransmissionTrackerStorage.DeleteEntry</name>
+         <comment>Deletes entry given transmission id</comment>
+         <xquery><![CDATA[
+            update for $transrec in input()/AeTransmissionTracker
+            where $transrec/TransmissionId = {0,number,#}
+            do delete $transrec/..
+         ]]></xquery>
+      </xquery-statement>
+
+      <!-- ============================== -->
+      <!-- Attachment Storage Statements -->
+      <!-- ============================== -->
+      <xquery-statement>
+         <name>AttachmentStorage.AttachProcess</name>
+         <xquery><![CDATA[
+            declare namespace tf = "http://namespaces.softwareag.com/tamino/TaminoFunction"
+            update for $procAttachment in input()/AeProcessAttachment
+            let $attachmentGroupId := tf:getInoId($procAttachment)
+            let $processId := $procAttachment/ProcessID
+            where $attachmentGroupId = {0,number,#}
+            do replace $processId with <ProcessID>{1,number,#}</ProcessID>
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>AttachmentStorage.QueryAttachmentHeaders</name>
+         <xquery><![CDATA[
+            for $attachment in input()/AeAttachment
+            let $attachmentItemId := tf:getInoId($attachment)
+            where $attachmentItemId = {0,number,#}
+            return $attachment/AttachmentHeader
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>AttachmentStorage.QueryAttachmentContentId</name>
+         <xquery><![CDATA[
+            for $attachment in input()/AeAttachment
+            let $attachmentItemId := tf:getInoId($attachment)
+            where $attachmentItemId = {0,number,#}
+            return $attachment/AttachmentContentID
+         ]]></xquery>
+      </xquery-statement>
+      <xquery-statement>
+         <name>AttachmentStorage.CleanupAttachments</name>
+         <xquery><![CDATA[
+            update for $procAttachment in input()/AeProcessAttachment[ ProcessID/@ae-null = true() ]
+            do delete $procAttachment/..
+         ]]></xquery>
+      </xquery-statement>
+
+   </xquery-statements>
+</tamino-config>
