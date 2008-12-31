@@ -1,0 +1,87 @@
+			   Deploying BPEL Processes
+
+
+
+This document describes how to deploy a BPEL process so the ActiveBPEL
+engine can execute it. For information about installing the engine, see
+"Installing and Configuring the ActiveBPEL Engine" (install_engine.txt).
+
+To deploy a BPEL process, you must create and install a deployment archive
+containing your BPEL process files. To do this, you will use the jar utility,
+which means you will need a Java SDK.
+
+Any version of the JDK should work. BPEL processes deployment has been tested
+using the 1.4.1 SDK.
+
+
+Deploying Your BPEL Process
+===========================
+
+Deploying a BPEL process involves creating a deployment archive file (a JAR
+with an extension of ".bpr") and copying that to your servlet container. To
+create this archive, you need to organize your files into a particular
+directory structure, create one or two configuration files, and then create an
+archive from that directory.
+
+Create a directory for your deployment files; we'll name it mybpel in this
+example. Create the subdirectories
+
+    * bpel
+    * META-INF
+    * wsdl
+    * partners (optional)
+
+The WSDL catalog (wsdlCatalog.xml) file, partner definition (.pdef) files, and
+process deployment descriptor (.pdd) files are described in "ActiveBPEL Engine
+File Formats" (file_formats.txt).
+
+As an example, let's say you have one BPEL file my_process.bpel and two WSDL
+files service1.wsdl and service2.wsdl. Your directory structure would look
+something like this:
+
+    mybpel
+        META-INF
+            wsdlCatalog.xml
+        bpel
+            my_process.bpl
+        my_process.pdd
+        wsdl
+            service1.wsdl
+            service2.wsdl
+
+The partners directory is not necessary unless you have .pdef files.
+
+Using this directory structure, create the archive and copy it to your servlet
+container. Here's how you would deploy your BPEL process to Tomcat (remove
+"partners" from the jar command if you don't have a partners directory):
+
+Windows:
+
+    C:\> cd mybpel
+    C:\mybpel> jar cf mybpel.bpr *.pdd META-INF bpel partners wsdl
+    C:\> cp mybpel.bpr $CATALINA_HOME/bpr
+
+Unix:
+
+    % cd mybpel
+    % jar cf mybpel.bpr *.pdd META-INF bpel partners wsdl
+    % cp mybpel.bpr $CATALINA_HOME/bpr
+
+It is fine for more than one .bpel file or .pdd file to live in the same
+.bpr deployment archive.
+
+Your WSDL files could live anywhere, even on another machine. Packaging them
+inside the .pdd lets the BPEL engine get to them quicker.
+
+The Engine
+==========
+
+If the ActiveBPEL engine is running, soon after you deploy your BPEL
+process the ActiveBPEL engine will notice the .bpr file and read it. Your
+BPEL process is ready to use.
+
+See "Starting the ActiveBPEL Engine" in install_engine.txt for instructions on
+starting and stopping the engine.
+
+"Engine Status Information" in install_engine.txt describes how to view the
+runtime status of Web services, the engine, and BPEL processes.
