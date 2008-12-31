@@ -1,0 +1,76 @@
+//$Header: /Development/AEDevelopment/projects/org.activebpel.rt.bpel/src/org/activebpel/rt/bpel/impl/activity/assign/AeCopyOperationComponentBase.java,v 1.3 2006/07/14 15:46:5
+/*
+ * Copyright (c) 2004-2006 Active Endpoints, Inc.
+ *
+ * This program is licensed under the terms of the GNU General Public License
+ * Version 2 (the "License") as published by the Free Software Foundation, and 
+ * the ActiveBPEL Licensing Policies (the "Policies").  A copy of the License 
+ * and the Policies were distributed with this program.  
+ *
+ * The License is available at:
+ * http: *www.gnu.org/copyleft/gpl.html
+ *
+ * The Policies are available at:
+ * http: *www.activebpel.org/licensing/index.html
+ *
+ * Unless required by applicable law or agreed to in writing, this program is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
+ * OF ANY KIND, either express or implied.  See the License and the Policies
+ * for specific language governing the use of this program.
+ */
+package org.activebpel.rt.bpel.impl.activity.assign; 
+
+
+/**
+ * Base class for copy operation components like <from> and <to> variant
+ * implementations. 
+ */
+public class AeCopyOperationComponentBase
+{
+   /** name of the variable */
+   private String mVariableName;
+   
+   /** used to resolve variable names and execute expressions */
+   private IAeCopyOperation mCopyOperation;
+   
+   /**
+    * Ctor accepts the def and context
+    */
+   public AeCopyOperationComponentBase()
+   {
+   }
+
+   /**
+    * @return Returns the copy operation.
+    */
+   protected IAeCopyOperation getCopyOperation()
+   {
+      return mCopyOperation;
+   }
+
+   /**
+    * @param aCopyOperation The context to set.
+    */
+   public void setCopyOperation(IAeCopyOperation aCopyOperation)
+   {
+      mCopyOperation = aCopyOperation;
+   }
+
+   /**
+    * Getter for the variable name
+    */
+   public String getVariableName()
+   {
+      return mVariableName;
+   }
+   
+   /**
+    * Setter for the variable name
+    * @param aVariableName
+    */
+   public void setVariableName(String aVariableName)
+   {
+      mVariableName = aVariableName;
+   }
+}
+ 
