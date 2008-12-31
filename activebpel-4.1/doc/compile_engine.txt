@@ -1,0 +1,81 @@
+                Compiling the ActiveBPEL Engine
+
+
+This document describes how to compile the ActiveBPEL engine.
+
+
+Dependencies
+============
+
+The ActiveBPEL engine requires an installed and properly configured servlet
+container. It has been tested with Tomcat. The compile scripts that come
+with the ActiveBPEL engine use the environment variable CATALINA_HOME, which
+defines the top-level Tomcat directory. The ActiveBPEL engine should run under
+any standard servlet container.
+
+You may download Tomcat from the Tomcat Web site
+(http://jakarta.apache.org/tomcat) or from the ActiveBPEL download page
+(http://www.activebpel.org/download).
+
+The compile script included with the source uses the Ant build tool. You can
+download Ant from the Ant Web site
+(http://ant.apache.org/)
+
+
+Downloading the Software
+========================
+
+Download the most recent version of the ActiveBPEL engine from the ActiveBPEL
+download page (http://www.activebpel.org/download). You will have a choice of
+downloading either a .tar.gz file or a .zip file. Both archives contain the
+same files. The name of the archive will be activebpel-version-type.tar.gz or
+activebpel-version-type.zip. "Version" is a version number like "1.0.1".
+"Type" is one of "src" (source), "bin" (binaries), or "all" (source and
+binaries). To compile ActiveBPEL, you will need either the "src" or "all" type.
+
+Extract the distribution from the archive using your favorite command line or
+GUI tool. Doing so will create a directory named activebpel-version. You may
+create, rename, or move this directory anywhere you wish. For the rest of this
+document, we will simply call this directory "activebpel".
+
+
+Compiling the Source
+====================
+
+To compile the source into deployable JAR and WAR files, open a console / 
+command window and change to the activebpel/projects/support directory. Execute 
+the following Ant command:
+
+ant -f activebpel.xml activebpel.all
+
+JAR and WAR files will be output to activebpel/dist.
+
+
+Building with Eclipse
+=====================
+
+The ActiveBPEL Engine is developed using the Eclipse IDE, however the archives
+do not ship with .project or .classpath files for use with Eclipse. To create
+these, simply use Eclipse to create a new project for each of the directories
+in the activebpel/projects directory.
+
+Once you've created a project for a given directory, you'll then need to modify
+the project Properties to add the appropriate entries to the Java Build Path /
+Libraries. The jars required are in activebpel/lib . There will also be some
+Java Build Path / Projects dependencies you'll need to resolve as well.
+
+You can get hints for these dependencies if you look in the 
+ae.build.properties file in the activebpel/projects/* directory. See the
+"project.class.path=..." section. If the dependency begins with "ae_", then 
+that's a checkbox in the Project Properties / Java Build Path / Projects tab.
+The rest are references to External Jars you'll add via the Project Properties
+/ Java Build Path / Libraries tab.
+
+Please see your Eclipse documentation for more details on how to do this.
+
+
+For additional information, you can visit the ActiveBPEL Support Forum
+(http://forums.activebpel.org/)
+
+
+
