@@ -1,0 +1,490 @@
+<html>
+<head>
+<title>Overview</title>
+<link rel="stylesheet" href="overview/style.css" type="text/css"/>
+</head>
+<body>
+
+<p>See the overview below for a description of the ActiveBPEL&trade; engine's
+architecture. The ActiveBPEL engine executes Business Process Execution
+Language (BPEL) processes. It accepts BPEL process definitions, creates
+process instances, and executes them. </p>
+
+<p>There are three main areas in the architecture of the ActiveBPEL engine:
+the <em><a href="#engine">engine</a></em>, <em><a
+href="#processes">processes</a></em>, and <em><a
+href="#activities">activities</a></em>. The ActiveBPEL engine coordinates the
+execution of one or more BPEL processes. Processes are in turn made up of
+activities, which may in turn contain or link to further activities. The
+ActiveBPEL engine creates a process from a BPEL process definition (an XML
+file) and then executes this process. (Processes may also be
+<em>abstract</em>, which means they are non-executable, but the ActiveBPEL
+engine runs executable processes.) This architecture document describes these
+three main areas&mdash;the engine, processes, and
+activities<small>.</small></p>
+
+<h2>Table of Contents</h2>
+
+<p>ActiveBPEL Engine Architecture</p>
+<ol>
+  <li><a href="#engine">The Engine</a></li>
+  <li><a href="#processes">Processes</a></li>
+  <li><a href="#activities">Activities</a></li>
+  <li><a href="#files">Files</a></li>
+</ol>
+
+<h2 id="engine">The Engine</h2>
+
+<p>The ActiveBPEL engine executes BPEL processes.</p>
+<div class="figure">
+  <img src="overview/images/engine_architecture.jpg" width="585" height="314" alt="Engine Architecture"/>
+  <p>Figure 1. Engine Architecture</p>
+</div>
+
+<p>The &quot;database&quot; elements on the right of this illustration
+represent generic persistent storage. The ActiveBPEL engine uses a pluggable
+architecture; different persistence managers may implement different storage
+mechanisms. The ActiveBPEL engine ships with a persistence manager that keeps
+everything in memory.</p>
+
+<h3>Engine Startup</h3>
+
+<p>An engine factory manages 
+  the creation of an ActiveBPEL engine. Separation of responsibilities 
+  is achieved through the use of objects that handle services such 
+  as queue management, alarm and timer services, and process deployment. 
+  The following pseudocode describes the factory's creation of the 
+  engine and supporting services.</p>
+<pre style="margin-bottom: 0;">
+engine = new Engine(getEngineConfigurationInfo(),
+                    createQueueManager(),
+                    createProcessStateManager());
+engine.setPlanManager(createProcessDeploymentProvider());
+createProcessDeploymentManager();
+createWorkManager();
+createAlarmAndTimerService();</pre>
+
+<p>Engine configuration is handled by an object that supplies default values
+  and reads the optional <code>aeEngineConfig.xml</code> file. The engine is
+  connected to a queue manager and a process state manager, objects that are
+  responsible for performing those services for the engine. </p>
+
+<p>A process deployment provider handles reading Process Deployment Descriptor
+  (.pdd) files, and a process deployment manager handles process creation (see
+  <em><a href="#processcreation">Process Creation</a></em> below).</p>
+
+<p>A work manager schedules asynchronous operations.</p>
+
+<h3><a name="processcreation"></a>Process Creation</h3>
+
+<p>A new BPEL process gets created when one of its start activities is
+  triggered, either by an incoming message or by a Pick activity's alarm. When
+  an incoming message contains correlation data, the engine finds the existing
+  process matching the data instead. See <em><a
+  href="#dispatching">Dispatching Requests</a></em> for details. </p>
+
+<p>When the engine reads a BPEL process definition it creates objects called
+  <em>activity definitions</em> that model the process.</p>
+
+<div class="figure">
+  <img width="409" height="185" src="overview/images/clip_image001.jpg" alt="Runtime Engine Object Creation"/>
+  <p>Figure 2. Runtime Engine Object Creation</p>
+</div>
+
+<p>Activity definitions contain all of the information required to instantiate
+  a BPEL <em>activity implementation</em> object. In this regard, definitions
+  are analogous to classes while the implementation objects are analogous to
+  instances of those classes&mdash;objects.</p>
+
+<p>Both the engine and its event listeners have access to these definitions.
+  The events contain an XPath value that indicates which activity in the
+  process is triggering the event. These XPath values come from the activity
+  definitions.</p>
+
+<p>The engine creates its implementation objects by using a Visitor pattern to
+  visit the activity definition object model and creating implementation
+  objects from this model. The ActiveBPEL engine encapsulates any
+  implementation logic within this construction process. For example, an
+  implicit scope within an invoke activity will generate an explicit scope
+  with a single invoke child activity. The designer or other listeners don't
+  have to know about these implementation decisions since they're only aware
+  of the definitions and their XPath information.</p>
+
+<h3>Input and Output</h3>
+
+<p>The ActiveBPEL engine 
+  itself does not handle input and output. Instead, protocol-specific 
+  handlers such as <code>AeBpelRPCHandler</code> and <code>AeBpelDocumentHandler</code> 
+  translate data from a particular protocol to a message and vice 
+  versa.</p>
+
+<h3>Data Handling</h3>
+
+<p>All variables implement the <code>IAeVariable</code> interface. This
+  interface has the ability to get the definition and the payload, which will
+  be different if the variable is declared as a type versus an element or
+  message. The message payload requires an interface for detailed interactions
+  with the part objects.</p>
+
+<h3>Expression Evaluation</h3>
+
+<p>All activities and links allow expressions for various attributes of the
+  object. These expressions require a consistent method for execution and
+  describing the execution context. The <code>IAeBpelObject</code> itself can
+  wrapper execution and can be supplied in the abstract base class from which
+  the objects inherit. The BPEL object is itself a scope (in the variable
+  sense of the word) and can be used to correctly retrieve the accessible
+  variables of the expression context. Evaluation allows all the XPath
+  extensions which have been documented in the BPEL spec (for example,
+  <code>bpws:getVariableData</code>).</p>
+
+<h3 id="debuglog">Debugging and Logging</h3>
+
+<p>During process execution, the ActiveBPEL engine fires events indicating its
+  progress. When logging is turned on, an instance of
+  <code>AEEngineLogger</code> listens for engine events and writes them out to
+  individual process log files. Once the process completes, the file will be
+  closed.</p>
+
+<p>The log files are created in the directory
+  <code><var>{user.home}</var>/AeBpelEngine/process-logs</code>, where
+  <code><var>{user.home}</var></code> is the value of the Java System property
+  &quot;user.home&quot;. The log files are named
+  <code><var>process-id</var>.log</code>, where
+  <code><var>process-id</var></code> is a process id number assigned by the
+  engine. To turn on logging, add a <code>Logging</code> element to
+  aeEngineConfig.xml. See <a
+  href="http://www.activebpel.org/docs/file_formats.html">ActiveBPEL Engine
+  Config File Formats</a> for details. </p>
+
+<h2 id="processes">Processes</h2>
+
+<p>A process consists of</p>
+<dl>
+  <dt>Partner links</dt>
+  <dd>Describe a relationship between two Web services at the interface
+    level</dd>
+  <dt>Partners</dt>
+  <dd>Entities taking part in a Web service transaction</dd>
+  <dt>Variables</dt>
+  <dd>Containers for values</dd>
+  <dt>Correlation sets</dt>
+  <dd>Sets of data that uniquely identify the business process. At
+    different times in the process, different correlation sets may
+    identify the process</dd>
+  <dt>Fault handlers</dt>
+  <dd>Describe what to do when problems occur</dd>
+  <dt>Compensation handlers</dt>
+  <dd>Describe how to reverse already-completed business processes</dd>
+  <dt>Event handlers</dt>
+  <dd>Handle incoming messages and alarms</dd>
+  <dt>A top-level activity</dt>
+  <dd>A single BPEL activity, usually a container for other activities</dd>
+</dl>
+
+<h3 id="dispatching">Dispatching Requests</h3>
+
+<p>Each BPEL process must have at least one <em>start activity</em>. A new
+  BPEL process gets created when one of its start activities is triggered,
+  either by an incoming message or by a Pick activity's alarm.</p>
+
+<p>The engine dispatches incoming messages to the correct process instance. If
+  there is correlation data, the engine tries to find the correct instance
+  that matches the correlation data. If there is no correlation data and the
+  request matches a start activity, a new process instance is created.</p>
+
+<div class="figure">
+  <img width="594" height="386" src="overview/images/clip_image002_0004.jpg" alt="Request Dispatch Flowchart"/>
+  <p>Figure 3. Request Dispatch Flowchart</p>
+</div>
+
+<h4 id="queued-receives">Queued Receives</h4>
+
+<p>The receive queue contains the currently executing receive activities
+across all process instances. Receive activities include onMessage activities
+that are part of a pick or an event handler. A receive activity is said to be
+executing when it has been queued by its parent (for example, a scope, flow,
+or sequence) but has not yet received the message that it's waiting for from
+the outside world.</p>
+
+<p>The receive queue also contains inbound messages from the outside world
+that did not match up to a waiting receive activity already in the queue and
+were themselves not capable of creating a new process instances. An unmatched
+receipt of data like this is possible given the asynchronous nature of some
+Web services. The engine will accept these unmatched messages provided that
+they contain correlation data. These messages are queued until a timeout
+period passes. The period is specified by the engine configuration parameter
+<code>UnmatchedReceiveTimeout</code>.</p>
+
+<p>If a process queues an activity like a receive, then this activity will
+stay in there until the data arrives or the process terminates (through a
+fault or terminate activity). Picks are slightly different: the first
+onMessage or onAlarm to match for the pick immediately sets the state of all
+of the other possible messages/alarms for that pick to <code>DEAD_PATH</code>.
+This will remove them from the queue. Event handlers automatically remove
+their queue entries once the scope that defines them completes.</p>
+
+<h2 id="activities">Activities</h2>
+
+<p>Activities are the building blocks of BPEL processes. <a
+  href="#basic"><em>Basic activities</em></a> are conceptually simple
+  behaviors like receiving a message, invoking a Web service, and assigning
+  values to variables. <a href="#structured"><em>Structured
+  activities</em></a> are similar to conditional and looping constructs in
+  programming languages. <a href="#special"><em>Special activities</em></a>
+  introduce variable scoping and handle abnormal activities such as process
+  termination and compensation (explicitly &quot;undoing&quot; a process).</p>
+
+<p>Activities are joined by links, either explicit or implicit. The path taken
+  through the activities and links is determined by many factors, including
+  the values of variables and the evaluation of expressions.</p>
+
+<p>Every activity exists within a <em>scope</em> which is a context for
+  variables, fault handlers, and compensation handlers. Scopes are
+  conceptually similar to programming language blocks that introduce new
+  variable scope and (depending upon the language and construct used)
+  exception handling mechanisms. Some activities such as Scope and Invoke
+  generate new scopes, whether implicitly or explicitly.</p>
+
+<h3>BPEL Activities</h3>
+
+<h4 id="basic">Basic activities</h4>
+<table class="border-table">
+  <tr>
+    <th>Activity</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td><code>&lt;receive&gt;</code></td>
+    <td>Block and wait for a message from a partner</td>
+  </tr>
+  <tr>
+    <td><code>&lt;reply&gt;</code></td>
+    <td>Reply back to the partner that sent the message we received</td>
+  </tr>
+  <tr>
+    <td><code>&lt;invoke&gt;</code></td>
+    <td>Call some other Web service, either one-way or request-response</td>
+  </tr>
+  <tr>
+    <td><code>&lt;assign&gt;</code></td>
+    <td>Assign or copy values to variables</td>
+  </tr>
+  <tr>
+    <td><code>&lt;throw&gt;</code></td>
+    <td>Generate a fault</td>
+  </tr>
+  <tr>
+    <td><code>&lt;wait&gt;</code></td>
+    <td>Wait for a given time period (time-out) or until a particular
+      time has passed (alarm)</td>
+  </tr>
+  <tr>
+    <td><code>&lt;empty&gt;</code></td>
+    <td>A no-op</td>
+  </tr>
+</table>
+
+<h4 id="structured">Structured activities</h4>
+<table class="border-table">
+  <tr>
+    <th>Activity</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td><code>&lt;sequence&gt;</code></td>
+    <td>Execute children in order</td>
+  </tr>
+  <tr>
+    <td><code>&lt;switch&gt;</code></td>
+    <td>Just like a &quot;switch&quot; or &quot;case&quot; statement</td>
+  </tr>
+  <tr>
+    <td><code>&lt;while&gt;</code></td>
+    <td>Repeat an activity while a condition is true</td>
+  </tr>
+  <tr>
+    <td><code>&lt;pick&gt;</code></td>
+    <td>Block and wait for a message, time-out, or alarm</td>
+  </tr>
+  <tr>
+    <td><code>&lt;flow&gt;</code></td>
+    <td>Children are executed concurrently; links can provide additional
+      control structure</td>
+  </tr>
+</table>
+
+<h4 id="special">Special activities</h4>
+<table class="border-table">
+  <tr>
+    <th>Activity</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td><code>&lt;scope&gt;</code></td>
+    <td>Define a new scope for variables, fault handlers, and compensation
+      handlers</td>
+  </tr>
+  <tr>
+    <td><code>&lt;compensate&gt;</code></td>
+    <td>Invoke compensation on an inner scope that has already completed
+      normally</td>
+  </tr>
+  <tr>
+    <td><code>&lt;terminate&gt;</code></td>
+    <td>Immediately terminate a business process instance</td>
+  </tr>
+</table>
+
+<h3>States</h3>
+
+<p>Each activity has an associated <em>state.</em> The activities enter or
+  exit these states based on the rules of BPEL. The activities also fire
+  events to notify listeners of their changes in state. There are mechanisms
+  in place for listening to these events.</p>
+
+<p>State constants are defined in <code>AeBpelState</code>. An activity must
+  be in one of the following states:</p>
+
+<table class="border-table">
+  <tr>
+    <th>State</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td><code>INACTIVE</code></td>
+    <td>All BPEL activities are in the inactive state when the Process
+      starts</td>
+  </tr>
+  <tr>
+    <td><code>READY_TO_EXECUTE</code></td>
+    <td>Ready to execute. These activities have been queued by their
+      parent and their join condition has evaluated to true</td>
+  </tr>
+  <tr>
+    <td><code>EXECUTING</code></td>
+    <td>Currently executing</td>
+  </tr>
+  <tr>
+    <td><code>FINISHED</code></td>
+    <td>Finished executing without a fault</td>
+  </tr>
+  <tr>
+    <td><code>FAULTED</code></td>
+    <td>Finished executing with a fault</td>
+  </tr>
+  <tr>
+    <td><code>DEAD_PATH</code></td>
+    <td>Removed from the execution path due to dead path elimination.
+      When a parent activity's state becomes <code>DEAD_PATH</code>,
+      that state is propagated to all of its children</td>
+  </tr>
+  <tr>
+    <td><code>QUEUED_BY_PARENT</code></td>
+    <td>Queued for execution by their parents</td>
+  </tr>
+  <tr>
+    <td><code>TERMINATED</code></td>
+    <td>Terminated</td>
+  </tr>
+  <tr>
+    <td>Unknown</td>
+    <td>The activity's state is <code>null</code>. If a parent activity's
+      state becomes unknown, then the childrens' states change to <code>INACTIVE</code>.</td>
+  </tr>
+</table>
+
+<h3>Activities</h3>
+
+<p>All activities have a common set of methods that facilitate the movement
+  between states and the above referenced event firing. This overview of these
+  methods is followed by a detailed description of each activity's
+  implementation.</p>
+
+<h4>Activity class hierarchy</h4>
+
+<div class="figure">
+  <img width="590" height="400" src="overview/images/clip_image002_0005.jpg" alt="Activity Class Hierarchy"/>
+  <p>Figure 4. Activity Class Hierarchy</p>
+</div>
+
+<p>Some activities such as the structured activities and Scope contain
+  other activities.</p>
+
+<h4>Common methods</h4>
+
+<p>These are some of the methods common to all activities.</p>
+
+<p><code>isReadyToExecute()</code></p>
+<blockquote> Returns true if the Activity is OK to prepare for execution.
+  This is determined by checking the activity's incoming links if
+  any. Some activities use this method to perform some initialization.</blockquote>
+
+<p><code>execute()</code></p>
+<blockquote> This is where the activity's primary action takes place.
+  The activity may set up any supporting elements required for the
+  activity's execution. An example of this is a Scope activity creating
+  variables. Then this method performs the primary action. For example,
+  if it's an Invoke, this is where the invocation is made to the
+  Web service. </blockquote>
+
+<p><code>objectCompleted()</code></p>
+<blockquote> Called by the activity when it is done with its execution.
+  This method processes any outgoing links (aka source links) and
+  then signals the process that the activity is complete.</blockquote>
+
+<p><code>terminate()</code></p>
+<blockquote> Called by a parent process when there is a fault and
+  the activity is required to terminate. </blockquote>
+
+<h3>Link handling and dead path elimination</h3>
+
+<p>The BPEL 1.1 spec covers 
+  link handling in Section 12.5. Below are some noteworthy points 
+  from the spec:</p>
+<ul>
+  <li>Links cannot cross the boundary of a <code>&lt;while&gt;</code>,
+    serializable <code>&lt;scope&gt;</code>, <code>&lt;eventHandlers&gt;</code>,
+    or a <code>&lt;compensationHandler&gt;</code></li>
+  <li>Links can only be OUTBOUND from within a Fault Handler</li>
+  <li>Activities that have <code>suppressJoinFailure</code> set to true have
+    an IMPLICIT Scope around them with the only behavior being a fault handler
+    for <code>bpws:joinFailure</code>. In the event that the activity is an
+    Invoke with an implicit Scope then the two Scopes are MERGED to form a
+    single Scope with the same name as the activity.</li>
+</ul>
+
+<h2 id="files">Files</h2>
+
+<p>See <a href="http://www.activebpel.org/docs/file_formats.html">ActiveBPEL
+Config File Formats</a> for descriptions of the formats and contents of these
+files.</p>
+
+<h3>Engine</h3>
+<dl>
+  <dt>aeEngineConfig.xml</dt>
+  <dd>When the ActiveBPEL engine is created, this file is loaded 
+    if it exists. It is used to set options such as the unmatched 
+    correlated receive timeout, whether XPath creation is allowed, 
+    external XPath function contexts, and more.</dd>
+</dl>
+
+<h3>BPEL Processes</h3>
+<dl>
+  <dt>*.bpr</dt>
+  <dd>A BPEL process archive. It contains the BPEL, Process Deployment
+    Description (.pdd), WSDL, and partner files necessary to deploy a BPEL
+    process. See <a href="http://www.activebpel.org/docs/deploy.html">Deploying
+    BPEL Processes</a>.</dd>
+  <dt>*.pdd</dt>
+  <dd>A Process Deployment Descriptor tells the ActiveBPEL engine about
+    a BPEL process. It describes the partner links and WSDL files
+    needed.</dd>
+  <dt>wsdlCatalog.xml</dt>
+  <dd>The WSDL catalog provides a way for the ActiveBPEL engine to find
+    WSDL files within a .bpr deployment archive. wsdlCatalog.xml
+    lives in the META-INF directory</dd>
+</dl>
+
+</body>
+</html>
