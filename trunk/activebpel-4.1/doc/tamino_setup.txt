@@ -1,0 +1,101 @@
+
+                             ActiveBPEL(TM) engine
+                               Version 4.1
+                                 Tamino Setup
+
+Contents
+
+   * Requirements
+   * Database setup
+   * Tomcat DataSource setup
+   * Engine configuration
+  
+
+Requirements
+
+    To setup the ActiveBPEL engine to run as a persistent engine you will need
+    the following:
+   
+        1) Tamino XML Server 4.2
+
+        2) aeEngine database tsd to create the necessary tables and keys
+
+        3) Modified aeEngineConfig.xml file (discussed below)
+
+        4) ActiveBPEL database configuration file
+   
+Database Setup
+
+    To setup Tomcat and ActiveBPEL to access a Tamino database you must: 
+
+        1) Have a database engine accessible
+
+        2) Have a database created with reject xsi:type set to false.
+
+        3) With the Database running execute the ActiveBPEL table create tsd.
+           ActiveBpel comes with a convenience class to help you install the 
+           schema. See instructions below to use the convenience class. All commands should be entered on 1 line. Optional parameters are denoted by an asterisk.
+           
+           a) If you have the source code available execute the following:
+           
+                cd [ActiveBPEL root directory]/projects/support.
+            
+                ant -f activebpel.xml activebpel.tamino.dbinstall  
+                   -Ddburl=<database url>
+                   -Ddbdatabase=<database name>
+                   -Ddbuser=<database username>*
+                   -Ddbpass=<database password>*
+                   -Ddbdomain=<domain name>*
+                   
+              Note: This will drop previously installed ActiveBpel schemas.
+              
+           
+           b) for distributions without source code execute the following      commands:
+           
+                cd [ActiveBPEL root directory].
+                
+                java -classpath  dist/ae_rt.jar;dist/ae_rtbpel.jar;dist/ae_rtbpelsvr.jar;dist/ae_tamino.jar;dist/ae_upgrade.jar;lib/jaxen-1.1-beta-8.jar;lib/qname.jar;/ib/log4j.jar;lib/xercesImpl.jar;lib/xmlParserAPIs.jar;lib/TaminoAPI4J.jar;lib/TaminoJCA.jar;lib/commonj-twm.jar;lib/log4j.jar org.activebpel.rt.bpel.server.engine.storage.tamino.installer.AeTaminoInstaller 
+                
+                -schema=dist/tamino/activebpel/ddl/ActiveBPEL-Tamino.tsd 
+                -url=<database_url> 
+                -drop=true 
+                -verbose=true 
+                -db=<database_name>  
+                -dbdomain=<domain>* 
+                -dbuser=<database_user>*
+                -dbpass=<database_password> *
+                
+           
+Engine configuration
+
+    ActiveBPEL is installed by default with in-memory management of process
+    information. To enable persistent management of process information with a 
+    Tamino database replace the ActiveBPEL engine configuration file (aeEngineConfig.xml)located in your %CATALINA_HOME%\bpr directory with the
+    aeEngineConfig-Tamino.xml file located in "[ActiveBPEL root
+    directory]/dist/conf/".
+    
+    The aeEngineConfig.xml file must be modified to connect to Tamino. In order to have ActiveBPEL connect to your database modify the following value attributes in the aeEngineConfig.xml to correspond to your database setup.
+    
+        <entry name="URL" value="@TAMINO_URL@" />
+        <entry name="Database" value="@TAMINO_DB_NAME@" />
+        
+    If your database is secured you may uncomment entries called username and password in the same section.
+    
+        <entry name="Username" value="" />
+        <entry name="Password" value="" />
+    
+    Additionally, you may also use domain authentication.  To do so you may uncomment the domain entry.  Use the name of your domain as the value for the entry.
+    
+        <entry name="Domain" value="" />
+    
+    To revert the ActiveBPEL engine to using in-memory management copy the
+    aeEngineConfig-InMemory.xml file located in "[ActiveBPEL root
+    directory]/dist/conf/" to the %CATALINA_HOME%\bpr directory.
+    
+    Note: Any ActiveBPEL engine configuration parameters that you had set are
+          now reset to the standard defaults (e.g., Allow Create XPath=false)
+
+Restart your Tomcat installation and you will be running the ActiveBPEL engine
+in a persistent manner.
+
+Copyright (c) 2004-2007, ActiveBPEL LLC.  All rights reserved.
