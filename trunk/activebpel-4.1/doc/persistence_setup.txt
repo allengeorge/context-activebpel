@@ -1,0 +1,139 @@
+
+                             ActiveBPEL(TM) engine
+                                 Version 4.1
+                               Persistence Setup
+
+Contents
+
+   * Requirements
+   * Database setup
+   * Tomcat DataSource setup
+   * Engine configuration
+  
+
+Requirements
+
+    To setup the ActiveBPEL engine to run as a persistent engine you will need
+    the following:
+   
+        1) RDBMS and associated JDBC driver and appropriate database
+           privileges to create tables Note: This version of ActiveBPEL has
+           been tested with MySQL 4.1, SQLServer 2000, DB2 8.1 and Oracle 10g
+           Release 1 (10.1).
+
+        2) aeEngine database ddl to create the necessary tables and keys
+
+        3) Modified aeEngineConfig.xml file (discussed below)
+
+        4) ActiveBPEL database configuration file
+   
+Database Setup
+
+    To setup Tomcat and ActiveBPEL to access a database you must: 
+
+        1) Have a database engine accessible
+
+        2) With the Database running execute the ActiveBPEL table create ddl
+           for your particular database. See your database's documentation for
+           instructions on execution.
+           
+           All of the supported databases have a corresponding DDL file in
+           [ActiveBPEL root directory]/dist/sql/activebpel.
+           
+Tomcat DataSource setup
+
+    To setup a DataSource within the Tomcat environment you will need to have
+    access to the Administration pages. This requires that you have added an
+    "admin" role and associated a user (new or existing) with that role. To
+    add a role/user to your Tomcat installation edit the tomcat-users.xml file
+    located in %CATALINA_HOME%\conf directory and add the following line:
+         
+         <role rolename="admin"/>
+
+    Then add a new user with the role admin or add admin to one of the default
+    user supplied.
+    
+    To add the DataSource perform the following steps:
+
+        1) Start/Restart Tomcat and go the Tomcat Administration page
+           [http://server:port/admin/]
+
+        2) Enter the user and password added above
+
+        3) From the left hand frame navigate to Tomcat
+           Server\Service\Host\Context (/active-bpel)\Resources\Data Sources
+
+        4) From the Data Sources Frame select "Create New Data Source" from
+           the list of Data Source Actions
+
+        5) Fill in the appropriate Data Source information (see below for
+           MySQL information)
+
+        6) Press the "Save" and then the "Commit" buttons. 
+
+        7) Make sure the JDBC driver .jar file is located in the
+           tomcat\common\lib folder. For example, when using MySQL this is the
+           "mysql-connector-java-3.0.17-production-bin.jar" file.
+
+     Data Source Settings for MySQL:
+        JNDI = jdbc/ActiveBPELDB
+        Data Source URL = jdbc:mysql://localhost:3306/ActiveBPEL?autoReconnect=true
+        JDBC Driver Class = com.mysql.jdbc.Driver
+        User Name = [db user name]
+        Password = [db password]
+        
+     Data Source Settings for DB2:
+        JNDI = jdbc/ActiveBPELDB
+        Data Source URL = jdbc:db2://localhost:50000/ABPEL
+        JDBC Driver Class = com.ibm.db2.jcc.DB2Driver
+        User Name = [db user name]
+        Password = [db password]
+     
+     Data Source Settings for Oracle:
+        JNDI = jdbc/ActiveBPELDB
+        Data Source URL = jdbc:oracle:thin:@//localhost:1521/ActiveBPEL
+        JDBC Driver Class = oracle.jdbc.OracleDriver
+        User Name = [db user name]
+        Password = [db password]
+     
+     Data Source Settings for SQLServer:
+        JNDI = jdbc/ActiveBPELDB
+        Data Source URL = jdbc:jtds:sqlserver://localhost:1433/ActiveBPEL
+        JDBC Driver Class = net.sourceforge.jtds.jdbc.Driver
+        User Name = [db user name]
+        Password = [db password]
+        
+        
+Engine configuration
+
+    ActiveBPEL is installed by default with in-memory management of process
+    information. To enable persistent management of process information
+    replace the ActiveBPEL engine configuration file (aeEngineConfig.xml)
+    located in your %CATALINA_HOME%\bpr directory with the
+    aeEngineConfig-Persistent.xml file located in "[ActiveBPEL root
+    directory]/dist/conf/".
+    
+    The aeEngineConfig.xml file must be modified to connect to your selected
+    database. In order to have ActiveBPEL connect to your database modify the
+    following value attribute in the aeEngineConfig.xml to correspond to your
+    database.
+    
+        <entry name="DatabaseType" value="mysql" />
+    
+    Valid values are:
+       - mysql
+       - db2
+       - sqlserver
+       - oracle
+    
+    To revert the ActiveBPEL engine to using in-memory management copy the
+    aeEngineConfig-InMemory.xml file located in "[ActiveBPEL root
+    directory]/dist/conf/" to the %CATALINA_HOME%\bpr directory.
+    
+    Note: Any ActiveBPEL engine configuration parameters that you had set are
+          now reset to the standard defaults (e.g., Allow Create XPath=false)
+
+Restart your Tomcat installation and you will be running the ActiveBPEL engine
+in a persistent manner.
+
+Copyright (c) 2004-2007, ActiveBPEL LLC.  All rights reserved.
