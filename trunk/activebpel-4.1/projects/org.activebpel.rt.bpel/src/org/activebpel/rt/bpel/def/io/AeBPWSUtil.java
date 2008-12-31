@@ -1,0 +1,101 @@
+// $Header: /Development/AEDevelopment/projects/org.activebpel.rt.bpel/src/org/activebpel/rt/bpel/def/io/AeBPWSUtil.java,v 1.3 2006/09/07 15:06:2
+/*
+ * Copyright (c) 2004-2006 Active Endpoints, Inc.
+ *
+ * This program is licensed under the terms of the GNU General Public License
+ * Version 2 (the "License") as published by the Free Software Foundation, and 
+ * the ActiveBPEL Licensing Policies (the "Policies").  A copy of the License 
+ * and the Policies were distributed with this program.  
+ *
+ * The License is available at:
+ * http: *www.gnu.org/copyleft/gpl.html
+ *
+ * The Policies are available at:
+ * http: *www.activebpel.org/licensing/index.html
+ *
+ * Unless required by applicable law or agreed to in writing, this program is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
+ * OF ANY KIND, either express or implied.  See the License and the Policies
+ * for specific language governing the use of this program.
+ */
+package org.activebpel.rt.bpel.def.io;
+
+import org.activebpel.rt.bpel.def.AeActivityDef;
+import org.activebpel.rt.bpel.def.activity.support.AeJoinConditionDef;
+import org.activebpel.rt.bpel.def.activity.support.AeSourceDef;
+import org.activebpel.rt.bpel.def.activity.support.AeSourcesDef;
+import org.activebpel.rt.bpel.def.activity.support.AeTargetDef;
+import org.activebpel.rt.bpel.def.activity.support.AeTargetsDef;
+import org.activebpel.rt.util.AeUtil;
+
+/**
+ * A Util class that has some convenience methods for working with the def layer for BPEl4WS 1.1.
+ * 
+ * TODO this class can probably go away (with its functionality moving to the BPEL4WS 1.1 reader visitor) once bpep has been updated to use 2.0 compatible visual models
+ */
+public class AeBPWSUtil
+{
+   /**
+    * Sets the join condition on the activity by first finding/creating the targets container, then
+    * finding/creating the join condition def, then setting the expression on the join condition def.
+    * 
+    * @param aJoinCondition
+    * @param aJoinConditionLang
+    * @param aActivityDef
+    */
+   public static void setJoinConditionOnActivity(String aJoinCondition, String aJoinConditionLang, AeActivityDef aActivityDef)
+   {
+      if (AeUtil.notNullOrEmpty(aJoinCondition))
+      {
+         AeTargetsDef targetsDef = aActivityDef.getTargetsDef();
+         if (targetsDef == null)
+         {
+            targetsDef = new AeTargetsDef();
+            aActivityDef.setTargetsDef(targetsDef);
+         }
+   
+         AeJoinConditionDef joinConditionDef = targetsDef.getJoinConditionDef();
+         if (joinConditionDef == null)
+         {
+            joinConditionDef = new AeJoinConditionDef();
+            targetsDef.setJoinConditionDef(joinConditionDef);
+         }
+         joinConditionDef.setExpression(aJoinCondition);
+         joinConditionDef.setExpressionLanguage(aJoinConditionLang);
+      }
+   }
+
+   /**
+    * Adds the source def to the given activity.
+    * 
+    * @param aSourceDef
+    * @param aActivityDef
+    */
+   public static void addSourceToActivity(AeSourceDef aSourceDef, AeActivityDef aActivityDef)
+   {
+      AeSourcesDef sourcesDef = aActivityDef.getSourcesDef();
+      if (sourcesDef == null)
+      {
+         sourcesDef = new AeSourcesDef();
+         aActivityDef.setSourcesDef(sourcesDef);
+      }
+      sourcesDef.addSourceDef(aSourceDef);
+   }
+
+   /**
+    * Adds the target def to the given activity.
+    * 
+    * @param aTargetDef
+    * @param aActivityDef
+    */
+   public static void addTargetToActivity(AeTargetDef aTargetDef, AeActivityDef aActivityDef)
+   {
+      AeTargetsDef targetsDef = aActivityDef.getTargetsDef();
+      if (targetsDef == null)
+      {
+         targetsDef = new AeTargetsDef();
+         aActivityDef.setTargetsDef(targetsDef);
+      }
+      targetsDef.addTargetDef(aTargetDef);
+   }
+}
