@@ -1,0 +1,307 @@
+/*
+
+DocFrame CSS file for HTML 4 output. Copyright (c) 2003 Scriptorium Publishing Services, Inc.
+
+This file is part of the DocFrame authoring environment. Only licensed users may use or modify this file. Distribution is limited to other DocFrame licensees.
+
+Revision history:
+2/18/03  DocFrame 1.0 released
+2/20/03  added copyright statement to top of file
+3/28/03 changed color for h3 to blue (line 54) and added definition for h4 (line 55)
+
+*/
+
+
+body {font-family: Arial, Helvetica, sans-serif;  font-size: 14pt;  font-weight: normal;}
+
+
+
+/* Paragraph-level styles */
+
+address {font-size: 10pt}
+.Author {font-size:10pt; font-family: Arial, Helvetica, sans-serif;  font-weight: bold;}
+.Bio {font-family: Arial, Helvetica, sans-serif;  font-size: 10pt;  font-weight: normal;}
+.BookTitle {font-size:2pt; font-family: Arial, Helvetica, sans-serif;  color: #ffffff; margin-top: 0em; margin-bottom: 0em}
+.Caption {font-size: 10pt; font-family: Arial, Helvetica, sans-serif; font-style: italic; text-align: left;}
+.CautionLabel{ font-weight: bold; color:#ff9933;}
+.CautionText { font-family: Arial, Helvetica, sans-serif;  font-size: 10pt;  font-weight: normal;}
+.Code {font-size: 10pt; font-family: Courier, Helvetica, sans-serif; font-style: normal; margin-top: 0em; margin-bottom: 0em}
+.Definition {font-size: 10pt;margin-top:.5em;margin-bottom:.5em;}
+.Footnote {font-family: Arial, Helvetica, sans-serif; font-size: 10pt; margin-top: .2em; margin-bottom: .2em;}
+.TableFootnote {font-family: Arial, Helvetica, sans-serif; font-size: 10pt;}
+.GlossTOC {font-size:10pt; font-family: Arial, Helvetica, sans-serif; margin-top: .0em; margin-bottom: .0em;}
+p.Para { font-family: Arial, Helvetica, sans-serif;  font-size: 10pt;  margin-top:.6em; margin-bottom:.6em;}
+.MenuItem { font-family: Arial, Helvetica, sans-serif;  font-size: 11pt;  color: #0000cc; margin-top: 0em; margin-bottom: 40em;}
+.TOC1 {font-size: 12pt; font-weight:bold;margin-top:1em;margin-bottom:0em;}
+.TOC2 {margin-left: 1em;font-size: 10pt;margin-top:0em;margin-bottom:0em;}
+.TOC3 {margin-left: 2em;font-size: 10pt;margin-top:0em;margin-bottom:0em;}
+.NavBarTop {font-size:9pt; text-align:right; margin-top: 0em; margin-bottom: 0em;}
+td p.Para { margin-top:.0em; margin-bottom:.0em;}
+td.Banner {font-family: Arial, Helvetica, sans-serif; margin-top: 0em; margin-bottom:0em; font-size: 1pt; text-align: center; font-weight: bold; color:white;}
+td.NavBarBottom {font-size:11pt; text-align:right; margin-top: .2em; margin-bottom: .2em;}
+th {font-size: 10pt; font-family: Arial, Helvetica, sans-serif; font-weight: bold; text-align: left;}
+.WarningLabel{font-weight: bold; color:Red;}
+.WarningText {font-family: Arial, Helvetica, sans-serif;  font-size: 10pt;  font-weight: normal;}
+.RevisionDate {font-size: 10pt; font-family: Arial, Helvetica, sans-serif; font-weight: normal;}
+.Version {font-size: 10pt; font-family: Arial, Helvetica, sans-serif; font-weight: normal; margin-top: 0em; margin-bottom: 0em;}
+.ContentsList {font-size: 10pt;font-weight:bold;margin-top:1em;margin-bottom:.5em;}
+.ContentItem {font-size: 10pt;margin-top:.5em;margin-bottom:.5em;}
+.Copyright {font-family: Arial, Helvetica, sans-serif; font-size: 8pt; margin-top: .2em; margin-bottom: .3em;}
+
+/* Headings */
+
+.Title1  { font-family: Arial, Helvetica, sans-serif;  font-weight: bold;}
+.Title2 { font-family: Arial, Helvetica, sans-serif;  font-weight: bold;}
+.Title3 { font-family: Arial, Helvetica, sans-serif; font-weight: bold;}
+.Title3 { font-family: Arial, Helvetica, sans-serif; font-weight: bold;}
+h1 {font-size:18pt; color: #1038D5; margin-bottom:.5em;}
+h2 {font-size:14pt; color: #1038D5; margin-bottom:.2em;}
+/* h3 {font-size:12pt; color: #40638A; margin-bottom:.0em;} */
+h3 {font-size:12pt; color: #000000; margin-bottom:.0em;}
+h4 {font-size:12pt; color: #68707A; margin-bottom:.0em;}
+
+/* Lists */
+/* li.ListItem {font-size: 8pt; font-weight: normal; margin-bottom: .2em;margin-top: .2em;color: #0000cc;} SOMETHING IS SCREWED UP IN THIS DEFINITION AND THE BROWSER IGNORES IT  */
+li.ListItem {font-size: 10pt;  font-weight: normal; color: #000000;}
+td li.ListItem {font-size: 10pt; font-weight: normal; margin-bottom: .2em;margin-top: .2em;}
+li.IX1 {font-size: 10pt; font-weight: normal; margin-bottom: .0em;margin-top: .0em;list-style-type: none;}
+li.IX2 {font-size: 10pt; font-weight: normal; margin-bottom: .0em;margin-top: .0em;list-style-type: disc;}
+li.IX3 {font-size: 10pt; font-weight: normal; margin-bottom: .0em;margin-top: .0em;list-style-type: square;}
+ol {margin-top:.2em;margin-bottom: .2em; }
+ul {margin-top:.2em;margin-bottom: .2em; }
+
+
+
+/* Character-level styles */
+.Emphasis {font-style: italic;}
+.MenuItem {font-weight: bold;}
+.Superscript {vertical-align: super; font-size:80%; vertical-align:30%;}
+.UserInput {font-family: Courier, Helvetica, sans-serif; font-size:10pt;}
+
+/* Table borders */
+
+table
+{ font-family: Arial, Helvetica, sans-serif;
+font-weight: normal;
+font-size: 11px;
+color: #404040;
+background-color: #fafafa;
+border-collapse: collapse;
+border: 1px #000000 solid;
+border-spacing: 0px;
+margin-top: 20px;
+margin-bottom: 20px; }
+
+td
+{ 
+text-align: left;
+font-family: Arial, Helvetica, sans-serif;
+font-weight: normal;
+font-size: 11px;
+color: #404040;
+background-color: #fafafa;
+border-collapse: collapse;
+border-bottom: 1px #6699CC dotted;
+border-left: 1px solid #6699CC;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 8px;
+padding-right: 8px; }
+
+
+th
+{ border-bottom: 1px #6699CC solid;
+text-align: left;
+font-family: Arial, Helvetica, sans-serif;
+font-weight: bold;
+font-size: 11px;
+color: #404040;
+background-color: #fafafa;
+border-left: 1px solid #6699CC;
+border-right: 0px;
+padding-top: 4px;
+padding-bottom: 1px;
+padding-left: 8px;
+padding-right: 8px; }
+
+
+
+td.servernav
+{ font-family: Arial, Helvetica, sans-serif;
+border-style: hidden;
+text-align: right;
+font-weight: normal;
+font-size: 11px;
+color: #404FFF;
+background-color: #ffffff;
+border: none;
+
+/* border-collapse: collapse; */
+border-spacing: 0px;
+margin-top: 20px;
+margin-bottom: 20px;
+border-left: 0px;
+border-right: 0px; }
+
+
+td.servernav-left
+{ font-family: Arial, Helvetica, sans-serif;
+
+vertical-align: bottom;
+text-align: left;
+font-weight: normal;
+font-size: 18px;
+color: #192561;
+background-color: #ffffff;
+
+/* border-collapse: collapse; */
+border-spacing: 0px;
+margin-top: 0px;
+margin-bottom: 0px;
+border-left: 0px;
+border-right: 0px; }
+
+td.content_top_item
+{ font-family: Arial, Helvetica, sans-serif;
+text-align: left;
+vertical-align: top;
+font-weight: normal;
+font-size: 14px;
+color: #404FFF;
+background-color: #D3E4F5;
+
+/* border-collapse: collapse; */
+margin-top: 20px;
+margin-bottom: 20px;
+border-bottom: none;
+border-left: 1px solid #000000;
+border-right: 1px solid #000000;
+border-top: 1px solid #000000;
+border-spacing: 20px;
+padding-right: 10px;    }
+
+td.content_bottom_item
+{ font-family: Arial, Helvetica, sans-serif;
+text-align: left;
+vertical-align: top;
+font-weight: normal;
+font-size: 14px;
+color: #404FFF;
+background-color: #D3E4F5;
+/* border-collapse: collapse; */
+margin-top: 20px;
+margin-bottom: 20px;
+border-bottom: 1px #000000 solid;
+border-left: 1px solid #000000;
+border-right: 1px solid #000000;
+border-spacing: 20px;
+padding-bottom: 10px;
+padding-right: 10px;    }
+
+
+
+td.content
+{ font-family: Arial, Helvetica, sans-serif;
+border-style: hidden;
+text-align: left;
+font-weight: normal;
+font-size: 14px;
+color: #000000;
+background-color: #d3e4f5;
+border: none;
+/* border-collapse: collapse; */
+border-spacing: 0px;
+margin-top: 4em;
+margin-bottom: 4em;
+border-bottom: none;
+border-top: none;
+border-left: 0px;
+border-right: 0px;
+padding-left: 10px;  }
+
+
+
+td.navTableHead
+{ font-family: Arial, Helvetica, sans-serif;
+text-align: left;
+font-weight: bold;
+font-size: 14px;
+color: #000000;
+background-color: #FFFFFF;
+/* border-collapse: collapse; */
+border-spacing: 0px;
+margin-top: .6em;
+margin-bottom: .6em;
+border-bottom: 1px #000000 solid;
+border-left: 0px;
+border-right: 0px;
+padding-top: 4px;
+padding-bottom: 6px;
+padding-left: 8px;
+padding-right: 8px;}
+
+
+
+/* body {
+  margin : 0px 0px 0px 0px;
+}
+*/
+
+#top {
+  position: absolute;
+  height: 100px;
+  width: 100%;
+  top:0px;
+  border:0px none;
+}
+
+
+#left { position: absolute;
+    height: 100%;
+    width: 224px;
+    left: 20px;
+    }
+
+  #main {margin: -20px 25px 25px 260px;
+    max-width: 55em;
+    }
+
+
+
+  /*  #left {
+position: relative; 
+  height:100%;
+  width:224px;
+  top:100px;
+  margin-left: 10px;
+}
+#main {
+ position: relative; 
+  top: 151px;
+  left: 260px;
+  right: 20px;
+}
+*/
+
+ @media print {
+	body {
+		background: white 
+	}
+
+	#doc-title-block { display: none; }
+
+	#left { display: none; }
+
+	#main, #logo {
+		position:relative;
+		width: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		float: none !important;
+		color: Black;
+		background: transparent;
+	}
+       }
+
+
